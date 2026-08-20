@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BellsGroup CRM - Comisiones</title>
+  <meta name="description" content="Economía personal del vendedor: comisiones, liquidaciones e ingresos proyectados.">
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Design System Compartido (Tokens + Base + Componentes) -->
+  <link rel="stylesheet" href="../bells.css">
+
+  <!-- Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <style>
+    /* Material Design 3 Redesign Overrides — Coherente con dashboard.html */
+    :root {
+      --primary: #6E3AFF;
+      --primary-light: #EDE7FF;
+      --primary-dark: #22005D;
+
+      --md-sys-color-primary: #6E3AFF;
+      --md-sys-color-primary-container: #EDE7FF;
+      --md-sys-color-on-primary-container: #22005D;
+      --md-sys-color-surface: #FFFFFF;
+      --md-sys-color-surface-variant: #F3F4F8;
+      --md-sys-color-background: #F8F9FE;
+      --md-sys-color-on-surface: #1B1B1F;
+      --md-sys-color-outline: #E0E2EC;
+
+      --color-warning-bg: #FFF8E1;
+      --color-warning-text: #8C6B00;
+      --color-success: #10B981;
+
+      --radius-s: 8px;
+      --radius-m: 16px;
+      --radius-l: 24px;
+
+      --shadow-1: 0px 2px 6px rgba(0, 0, 0, 0.04);
+      --shadow-2: 0px 4px 16px rgba(110, 58, 255, 0.08);
+
+      --font-family: 'Inter', sans-serif;
+      --bg-main: var(--md-sys-color-background);
+      --bg-card: var(--md-sys-color-surface);
+      --border-color: var(--md-sys-color-outline);
+    }
+
+    body {
+      font-family: var(--font-family) !important;
+      background-color: var(--bg-main) !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+
+    /* ============ Sidebar (MD3 Navigation Drawer) ============ */
+    .sidebar-left {
+      width: 260px !important;
+      background-color: var(--md-sys-color-surface) !important;
+      border-right: 1px solid var(--md-sys-color-outline) !important;
+      padding: 24px 16px !important;
+      gap: 24px !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    .sidebar-branding {
+      border-bottom: none !important;
+      padding: 0 12px 0px !important;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-branding .brand-icon {
+      width: 36px !important;
+      height: 36px !important;
+      background: var(--md-sys-color-primary) !important;
+      color: white !important;
+      border-radius: 10px !important;
+      display: grid !important;
+      place-items: center !important;
+      box-shadow: none !important;
+    }
+
+    .sidebar-branding .brand-name {
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      font-size: 1.25rem !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.5px !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+
+    .sidebar-nav {
+      gap: 4px !important;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-nav .nav-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #767680;
+      text-transform: uppercase;
+      padding: 8px 12px 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-nav .nav-item {
+      border-radius: 100px !important;
+      padding: 12px 16px !important;
+      color: #44474E !important;
+      font-size: 0.9rem !important;
+      font-weight: 500 !important;
+      transition: all 0.2s ease !important;
+      background: transparent !important;
+      justify-content: flex-start !important;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .sidebar-nav .nav-item:hover {
+      background-color: var(--md-sys-color-surface-variant) !important;
+      transform: none !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+
+    .sidebar-nav .nav-item.active {
+      background-color: var(--md-sys-color-primary-container) !important;
+      color: var(--md-sys-color-on-primary-container) !important;
+      font-weight: 700 !important;
+    }
+
+    .sidebar-nav .nav-item .material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    .campaign-card {
+      margin-top: auto;
+      background: linear-gradient(135deg, #F3ECFF 0%, #E8DDFF 100%);
+      padding: 16px;
+      border-radius: var(--radius-m);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    /* ============ Top Bar ============ */
+    .top-header {
+      height: 64px !important;
+      background-color: var(--md-sys-color-surface) !important;
+      border-bottom: 1px solid var(--md-sys-color-outline) !important;
+      padding: 0 32px !important;
+      box-shadow: none !important;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .top-header .user-profile {
+      gap: 12px !important;
+      display: flex;
+      align-items: center;
+    }
+
+    .top-header .user-avatar {
+      width: 36px !important;
+      height: 36px !important;
+      background-color: var(--md-sys-color-primary-container) !important;
+      color: var(--md-sys-color-primary) !important;
+      border-radius: 50% !important;
+      display: grid !important;
+      place-items: center !important;
+      font-weight: 700 !important;
+      font-size: 14px !important;
+    }
+
+    .top-header .user-info .user-name {
+      font-size: 0.85rem !important;
+      font-weight: 700 !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+
+    .top-header .user-info .user-role {
+      font-size: 0.75rem !important;
+      color: #5F6368 !important;
+    }
+
+    /* ============ Content ============ */
+    .dashboard-body {
+      padding: 24px 32px !important;
+      gap: 20px !important;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .welcome-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .welcome-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .welcome-subtitle {
+      color: #5F6368;
+      font-size: 0.9rem;
+      margin: 2px 0 0;
+    }
+
+    .welcome-summary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* Period selector pills (segmented control) */
+    .period-selector {
+      display: flex;
+      background-color: var(--md-sys-color-surface-variant);
+      padding: 4px;
+      border-radius: 100px;
+      gap: 0;
+      width: fit-content;
+      flex-wrap: wrap;
+    }
+
+    .period-selector button {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: #44474E;
+      transition: all 0.2s ease;
+      font-family: var(--font-family);
+    }
+
+    .period-selector button.active {
+      background-color: var(--md-sys-color-surface);
+      box-shadow: var(--shadow-1);
+      color: var(--md-sys-color-primary);
+      font-weight: 700;
+    }
+
+    /* KPIs Grid */
+    .scorecard-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+      gap: 16px !important;
+      width: 100% !important;
+    }
+
+    .scorecard-grid .kpi-card {
+      background: var(--md-sys-color-surface) !important;
+      padding: 20px !important;
+      border-radius: var(--radius-m) !important;
+      box-shadow: var(--shadow-1) !important;
+      border: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+
+    .scorecard-grid .kpi-card:hover {
+      transform: translateY(-4px) !important;
+      box-shadow: var(--shadow-2) !important;
+    }
+
+    .scorecard-grid .kpi-card .kpi-header {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      color: #5F6368 !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      margin-bottom: 0 !important;
+    }
+
+    .scorecard-grid .kpi-card .kpi-value {
+      font-size: 1.6rem !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.5px !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+
+    .scorecard-grid .kpi-card .kpi-sub {
+      font-size: 0.75rem !important;
+      color: #70757A !important;
+    }
+
+    .scorecard-grid .kpi-card .kpi-icon {
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 8px !important;
+      display: grid !important;
+      place-items: center !important;
+      background-color: var(--md-sys-color-surface-variant) !important;
+      color: var(--md-sys-color-primary) !important;
+      font-size: 18px !important;
+    }
+
+    /* Panels */
+    .md-panel {
+      background: var(--md-sys-color-surface) !important;
+      border-radius: var(--radius-l) !important;
+      padding: 24px !important;
+      box-shadow: var(--shadow-1) !important;
+      border: none !important;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .md-panel .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .md-panel .panel-title-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .chart-wrapper {
+      height: 320px;
+      position: relative;
+    }
+
+    /* Compañías grid */
+    .companies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+
+    .company-card {
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-m);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow-1);
+    }
+
+    .company-card .company-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .company-card .company-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .company-card .company-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .company-card .company-model {
+      font-size: 0.75rem;
+      color: #5F6368;
+      font-weight: 500;
+    }
+
+    .model-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    .company-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .company-row .row-label {
+      color: #70757A;
+      font-weight: 500;
+    }
+
+    .company-row .row-value {
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    /* Tabla liquidaciones */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .comm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .comm-table th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #70757A;
+      font-weight: 700;
+      background-color: #FAFAFD;
+      border-bottom: 1px solid var(--md-sys-color-outline);
+    }
+
+    .comm-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--md-sys-color-outline);
+      color: var(--md-sys-color-on-surface);
+      font-weight: 500;
+    }
+
+    .comm-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comm-table .amount {
+      font-weight: 700;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .estado-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .estado-pagado {
+      background: #DCFCE7;
+      color: #15803D;
+    }
+
+    .estado-pendiente {
+      background: #FFF8E1;
+      color: #8C6B00;
+    }
+
+    /* Info card */
+    .info-card {
+      background: var(--md-sys-color-surface-variant);
+      border-radius: var(--radius-m);
+      padding: 16px 20px;
+      font-size: 0.82rem;
+      color: #44474E;
+      line-height: 1.55;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .info-card .info-title {
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .info-card ul {
+      margin: 0;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-card strong {
+      color: var(--md-sys-color-primary-dark);
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 40px 20px;
+      text-align: center;
+      color: #70757A;
+      font-size: 0.85rem;
+    }
+
+    .empty-state .material-symbols-outlined {
+      font-size: 40px;
+      color: #B9BCC7;
+    }
+
+    /* Collapsed sidebar (igual que dashboard) */
+    .sidebar-left.collapsed {
+      width: 78px !important;
+      padding: 24px 10px !important;
+    }
+
+    .sidebar-left.collapsed .sidebar-nav .nav-label,
+    .sidebar-left.collapsed .campaign-card {
+      display: none !important;
+    }
+
+    .sidebar-left.collapsed .brand-name {
+      max-width: 0;
+      opacity: 0;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: opacity 0.2s ease, max-width 0.3s ease;
+    }
+
+    .sidebar-left.collapsed .sidebar-branding {
+      justify-content: center !important;
+      padding: 0 !important;
+      gap: 0 !important;
+    }
+
+    .sidebar-left.collapsed .sidebar-nav .nav-item {
+      justify-content: center !important;
+      padding: 12px 0 !important;
+      border-radius: 50% !important;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto;
+      gap: 0 !important;
+    }
+
+    .sidebar-left.collapsed .sidebar-nav .nav-item span:not(.material-symbols-outlined) {
+      max-width: 0;
+      opacity: 0;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: opacity 0.2s ease, max-width 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-left.collapsed {
+        width: 260px !important;
+        padding: 24px 16px !important;
+      }
+      .sidebar-left.collapsed .brand-name,
+      .sidebar-left.collapsed .sidebar-nav .nav-label,
+      .sidebar-left.collapsed .sidebar-nav .nav-item span:not(.material-symbols-outlined),
+      .sidebar-left.collapsed .campaign-card {
+        display: block !important;
+      }
+      .sidebar-left.collapsed .brand-name {
+        max-width: 200px;
+        opacity: 1;
+      }
+      .sidebar-left.collapsed .sidebar-branding {
+        justify-content: flex-start !important;
+        padding: 0 12px !important;
+        gap: 12px !important;
+      }
+      .sidebar-left.collapsed .sidebar-nav .nav-item {
+        justify-content: flex-start !important;
+        padding: 12px 16px !important;
+        border-radius: 100px !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        gap: 12px !important;
+      }
+      .sidebar-left.collapsed .sidebar-nav .nav-item span:not(.material-symbols-outlined) {
+        max-width: 200px;
+        opacity: 1;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D1D5DB;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9CA3AF;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-wrapper">
+    <!-- Backdrop móvil -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+
+    <!-- Left Sidebar (Material 3 Navigation Drawer) -->
+    <aside class="sidebar-left" id="dashboard-col-left">
+      <script>if (localStorage.getItem('bells-sidebar-collapsed') === 'true') { document.getElementById('dashboard-col-left').classList.add('collapsed'); }</script>
+
+      <div class="sidebar-branding">
+        <div class="brand-icon">
+          <span class="material-symbols-outlined">notifications_active</span>
+        </div>
+        <span class="brand-name">BellsGroup</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-label">General</span>
+        <a href="dashboard.html" class="nav-item">
+          <span class="material-symbols-outlined">dashboard</span> <span>Dashboard</span>
+        </a>
+        <a href="Clientes.html" class="nav-item">
+          <span class="material-symbols-outlined">group</span> <span>Clientes</span>
+        </a>
+        <a href="Embudo.html" class="nav-item">
+          <span class="material-symbols-outlined">filter_alt</span> <span>Embudo de ventas</span>
+        </a>
+        <a href="Comisiones.html" class="nav-item active">
+          <span class="material-symbols-outlined">payments</span> <span>Comisiones</span>
+        </a>
+
+        <span class="nav-label" style="margin-top: 12px;">Herramientas</span>
+        <a href="dashboard.html#prospect" class="nav-item">
+          <span class="material-symbols-outlined">person_add</span> <span>Registrar Prospecto</span>
+        </a>
+        <a href="dashboard.html#simulations" class="nav-item">
+          <span class="material-symbols-outlined">calculate</span> <span>Simulaciones</span>
+        </a>
+        <a href="dashboard.html#report" class="nav-item">
+          <span class="material-symbols-outlined">download</span> <span>Reportes</span>
+        </a>
+        <a href="Configuracion-vendedor.html" class="nav-item">
+          <span class="material-symbols-outlined">settings</span> <span>Configuración</span>
+        </a>
+        <a href="Historial reciente.html" class="nav-item">
+          <span class="material-symbols-outlined">history</span> <span>Historial Reciente</span>
+        </a>
+      </nav>
+
+      <div class="campaign-card" style="background: linear-gradient(135deg, #F3ECFF 0%, #E8DDFF 100%);">
+        <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.85rem; color:var(--md-sys-color-on-primary-container);">
+          <span class="material-symbols-outlined" style="font-size:18px;">savings</span>
+          <span>Mi Economía</span>
+        </div>
+        <div style="font-size:0.75rem; color:#44474E; line-height:1.4;">
+          <span id="sidebar-monthly-income">$0</span> estimados por mes
+        </div>
+      </div>
+
+      <button id="sidebar-collapse-btn" class="sidebar-collapse-btn" onclick="toggleSidebar()" title="Colapsar sidebar" aria-controls="dashboard-col-left" aria-expanded="true">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <header class="top-header">
+        <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Colapsar sidebar" aria-controls="dashboard-col-left" aria-expanded="true" style="margin-right: auto;">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="user-profile">
+          <a href="../General/Mi perfil.html" class="d-flex items-center gap-10 c-inherit td-none">
+            <div class="user-avatar" id="user-avatar">C</div>
+            <div class="user-info">
+              <span class="user-name" id="user-display-name">Carlos</span>
+              <span class="user-role" id="user-display-role">Asesor Comercial</span>
+            </div>
+          </a>
+          <button class="logout-btn" onclick="logout()" title="Cerrar sesión">
+            <i class="fa-solid fa-power-off"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Dashboard Body -->
+      <main class="dashboard-body" id="dashboard-col-center">
+
+        <!-- Encabezado de Bienvenida -->
+        <div class="welcome-header">
+          <div>
+            <h2 class="welcome-title">Hola, <span id="welcome-user-name">Carlos</span></h2>
+            <p class="welcome-subtitle">Tu economía personal · Comisiones y liquidaciones</p>
+          </div>
+          <div class="welcome-summary" id="welcome-summary">Proyección: <span id="welcome-summary-value" style="margin-left:4px;">$0</span></div>
+        </div>
+
+        <!-- Selector de horizonte -->
+        <div class="period-selector" id="period-selector" role="group" aria-label="Horizonte de proyección">
+          <button type="button" data-period="15d" onclick="setHorizon('15d')">15 días</button>
+          <button type="button" data-period="1m" class="active" onclick="setHorizon('1m')">1 mes</button>
+          <button type="button" data-period="3m" onclick="setHorizon('3m')">3 meses</button>
+          <button type="button" data-period="6m" onclick="setHorizon('6m')">6 meses</button>
+          <button type="button" data-period="1y" onclick="setHorizon('1y')">1 año</button>
+        </div>
+
+        <!-- Scorecard KPIs -->
+        <div class="scorecard-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>Ingreso Proyectado</span>
+              <div class="kpi-icon"><span class="material-symbols-outlined">account_balance_wallet</span></div>
+            </div>
+            <div class="kpi-value" id="kpi-projected">$0</div>
+            <div class="kpi-sub" id="kpi-projected-sub">Horizonte seleccionado</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>Comisiones del período</span>
+              <div class="kpi-icon"><span class="material-symbols-outlined">payments</span></div>
+            </div>
+            <div class="kpi-value" id="kpi-commissions">$0</div>
+            <div class="kpi-sub" id="kpi-commissions-sub">Promedio mensual estimado</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>Sueldo Fijo</span>
+              <div class="kpi-icon"><span class="material-symbols-outlined">badge</span></div>
+            </div>
+            <div class="kpi-value" id="kpi-salary">$0</div>
+            <div class="kpi-sub" id="kpi-salary-sub">Por mes</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>Comisiones pendientes de cobro</span>
+              <div class="kpi-icon"><span class="material-symbols-outlined">hourglass_top</span></div>
+            </div>
+            <div class="kpi-value" id="kpi-pending">$0</div>
+            <div class="kpi-sub" id="kpi-pending-sub">Liquidaciones sin cobrar</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>Ingreso mensual estimado</span>
+              <div class="kpi-icon"><span class="material-symbols-outlined">trending_up</span></div>
+            </div>
+            <div class="kpi-value" id="kpi-monthly">$0</div>
+            <div class="kpi-sub" id="kpi-monthly-sub">Sueldo + comisiones</div>
+          </div>
+        </div>
+
+        <!-- Gráfico de proyección -->
+        <div class="md-panel">
+          <div class="panel-title">
+            <div class="panel-title-text">
+              <span class="material-symbols-outlined" style="color:var(--md-sys-color-primary);">monitoring</span>
+              <span>Proyección de ingresos</span>
+            </div>
+            <span style="font-size:0.75rem; color:#70757A;" id="chart-period-label">Últimos 6 meses · próximos 6 meses</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="incomeChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Desglose por compañía -->
+        <div class="md-panel">
+          <div class="panel-title">
+            <div class="panel-title-text">
+              <span class="material-symbols-outlined" style="color:var(--md-sys-color-primary);">domain</span>
+              <span>Desglose por compañía</span>
+            </div>
+            <span style="font-size:0.75rem; color:#70757A;" id="companies-period-label">Proyección mensual</span>
+          </div>
+          <div class="companies-grid" id="companies-grid">
+            <!-- Render dinámico -->
+          </div>
+        </div>
+
+        <!-- Liquidaciones -->
+        <div class="md-panel">
+          <div class="panel-title">
+            <div class="panel-title-text">
+              <span class="material-symbols-outlined" style="color:var(--md-sys-color-primary);">receipt_long</span>
+              <span>Mis liquidaciones</span>
+            </div>
+            <span style="font-size:0.75rem; color:#70757A;" id="liquidaciones-count"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="comm-table" id="liquidaciones-table">
+              <thead>
+                <tr>
+                  <th>Periodo</th>
+                  <th>Compañía</th>
+                  <th style="text-align:right;">Monto Bruto</th>
+                  <th style="text-align:right;">Comisión</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="liquidaciones-tbody">
+                <!-- Render dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Cómo se calcula -->
+        <div class="info-card">
+          <div class="info-title">
+            <span class="material-symbols-outlined" style="font-size:18px; color:var(--md-sys-color-primary);">info</span>
+            <span>Cómo se calcula tu economía</span>
+          </div>
+          <ul>
+            <li><strong>Sueldo 100%:</strong> ingreso fijo, sin comisiones.</li>
+            <li><strong>Sueldo + comisión absorbible:</strong> el sueldo ya incluye un mínimo de comisiones (absorbible). Las comisiones generadas se absorben contra ese importe; solo lo que supera el absorbible se paga por encima del sueldo.</li>
+            <li><strong>Solo comisión:</strong> la compañía liquida directo; tu ingreso es la comisión de la liquidación.</li>
+            <li><strong>Patrimoniales (autos):</strong> liquidación de autos; tu ingreso es la comisión de cada liquidación.</li>
+          </ul>
+          <div>La proyección se calcula con el promedio de tus últimas liquidaciones por compañía. El administrador carga las liquidaciones desde el Backoffice.</div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    /* ==========================================================================
+       Módulo Comisiones — Economía personal del vendedor
+       Fuentes de datos (localStorage, mismo patrón que el resto del sistema):
+         - bells-companies          : compañías y modelo de negocio
+         - bells-seller-categories  : categorías de vendedor (sueldo, absorbible, tasas)
+         - bells-liquidaciones      : liquidaciones por vendedor y compañía
+         - bells-asesores           : colaboradores (extensión: campo category)
+       ========================================================================== */
+
+    const MODELS = {
+      'sueldo-fijo':        { label: 'Sueldo 100%',              icon: 'badge' },
+      'sueldo-absorbible':  { label: 'Sueldo + Absorbible',      icon: 'sync_alt' },
+      'solo-comision':      { label: 'Solo comisión',            icon: 'trending_up' },
+      'patrimoniales':      { label: 'Patrimoniales (Autos)',    icon: 'directions_car' }
+    };
+
+    const MODEL_COLORS = {
+      'sueldo-fijo':       '#94A3B8',
+      'sueldo-absorbible': '#6E3AFF',
+      'solo-comision':     '#0EA5E9',
+      'patrimoniales':     '#10B981'
+    };
+
+    const HORIZONS = {
+      '15d': { label: '15 días', months: 0.5 },
+      '1m':  { label: '1 mes',   months: 1 },
+      '3m':  { label: '3 meses', months: 3 },
+      '6m':  { label: '6 meses', months: 6 },
+      '1y':  { label: '1 año',   months: 12 }
+    };
+
+    const CURRENT_HORIZON = '1m';
+
+    /* ---------- Formato ---------- */
+    const fmtARS = n => new Intl.NumberFormat('es-AR', {
+      style: 'currency', currency: 'ARS', maximumFractionDigits: 0
+    }).format(Math.round(n || 0));
+
+    function fmtPeriod(periodo) { // 'YYYY-MM' -> 'Jul 26'
+      const [y, m] = periodo.split('-').map(Number);
+      const d = new Date(y, m - 1, 1);
+      return d.toLocaleDateString('es-AR', { month: 'short' }) + ' ' + String(y).slice(2);
+    }
+
+    function currentPeriod() {
+      const now = new Date();
+      return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    }
+
+    function shiftPeriod(periodo, offset) {
+      const [y, m] = periodo.split('-').map(Number);
+      const d = new Date(y, m - 1 + offset, 1);
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    }
+
+    function monthDiff(a, b) { // a - b en meses ('YYYY-MM')
+      const [ay, am] = a.split('-').map(Number);
+      const [by, bm] = b.split('-').map(Number);
+      return (ay - by) * 12 + (am - bm);
+    }
+
+    /* ---------- Sesión ---------- */
+    function getCurrentUser() {
+      return {
+        name: localStorage.getItem('bells_user_name') || 'Carlos',
+        role: localStorage.getItem('bells_user_role') || 'Asesor'
+      };
+    }
+
+    function logout() {
+      localStorage.removeItem('bells_user_name');
+      localStorage.removeItem('bells_user_role');
+      window.location.href = '../General/login.html';
+    }
+
+    /* ---------- Data layer ---------- */
+    function getCompanies() {
+      const stored = localStorage.getItem('bells-companies');
+      if (stored) return JSON.parse(stored);
+      const defaults = [
+        { id: 'zurich',            nombre: 'Zurich Seguros',          modelo: 'sueldo-absorbible', tasa: 40, color: '#6E3AFF' },
+        { id: 'capitales',         nombre: 'Mercado de Capitales',    modelo: 'solo-comision',     tasa: 60, color: '#0EA5E9' },
+        { id: 'patrimoniales',     nombre: 'Patrimoniales (Autos)',   modelo: 'patrimoniales',     tasa: 25, color: '#10B981' }
+      ];
+      localStorage.setItem('bells-companies', JSON.stringify(defaults));
+      return defaults;
+    }
+
+    function getCategories() {
+      const stored = localStorage.getItem('bells-seller-categories');
+      if (stored) return JSON.parse(stored);
+      const defaults = [
+        { id: 'junior',      nombre: 'Junior',      sueldoBase: 400000, absorbible: 300000, tasas: { zurich: 40, capitales: 60, patrimoniales: 25 } },
+        { id: 'semi-senior', nombre: 'Semi Senior', sueldoBase: 550000, absorbible: 450000, tasas: { zurich: 40, capitales: 60, patrimoniales: 25 } },
+        { id: 'senior',      nombre: 'Senior',      sueldoBase: 750000, absorbible: 600000, tasas: { zurich: 40, capitales: 60, patrimoniales: 25 } }
+      ];
+      localStorage.setItem('bells-seller-categories', JSON.stringify(defaults));
+      return defaults;
+    }
+
+    function getAsesores() {
+      const stored = localStorage.getItem('bells-asesores');
+      if (stored) {
+        const list = JSON.parse(stored);
+        // Migración: categorías por defecto para asesores pre-existentes
+        const defaultCats = { 'Carlos A.': 'semi-senior', 'Ana M.': 'senior', 'Pedro A.': 'junior', 'Sofia G.': 'semi-senior', 'Juan M.': 'junior', 'Lucia P.': 'senior' };
+        let changed = false;
+        list.forEach(a => {
+          if (!a.category && defaultCats[a.name]) { a.category = defaultCats[a.name]; changed = true; }
+        });
+        if (changed) localStorage.setItem('bells-asesores', JSON.stringify(list));
+        return list;
+      }
+      const defaults = [
+        { name: "Carlos A.", role: "Asesor Comercial", email: "carlos.a@bellsgroup.com", status: "activo", docType: "DNI", docNumber: "38.223.114", phone: "+54 9 11 3445-6677", category: "semi-senior" },
+        { name: "Ana M.", role: "Senior Account Manager", email: "ana.m@bellsgroup.com", status: "activo", docType: "CUIT", docNumber: "27-35667882-9", phone: "+54 9 11 4455-8899", category: "senior" },
+        { name: "Pedro A.", role: "Junior Advisor", email: "pedro.a@bellsgroup.com", status: "activo", docType: "DNI", docNumber: "40.112.556", phone: "+54 9 11 2233-4455", category: "junior" },
+        { name: "Sofia G.", role: "Asesor Comercial", email: "sofia.g@bellsgroup.com", status: "activo", docType: "DNI", docNumber: "39.445.667", phone: "+54 9 11 6677-8899", category: "semi-senior" },
+        { name: "Juan M.", role: "Asesor Comercial", email: "juan.m@bellsgroup.com", status: "inactivo", docType: "DNI", docNumber: "37.556.778", phone: "+54 9 11 9988-7766", category: "junior" },
+        { name: "Lucia P.", role: "Asesor Comercial", email: "lucia.p@bellsgroup.com", status: "activo", docType: "DNI", docNumber: "41.223.445", phone: "+54 9 11 8877-6655", category: "senior" }
+      ];
+      localStorage.setItem('bells-asesores', JSON.stringify(defaults));
+      return defaults;
+    }
+
+    function getLiquidaciones() {
+      const stored = localStorage.getItem('bells-liquidaciones');
+      if (stored) return JSON.parse(stored);
+      const now = currentPeriod();
+      const sellers = getAsesores();
+      const carlos = (sellers.find(a => a.name === 'Carlos A.') || {}).email || 'carlos.a@bellsgroup.com';
+      const rnd = (base, spread) => base + Math.round((Math.random() - 0.5) * spread);
+
+      const seed = [];
+      const companies = ['zurich', 'capitales', 'patrimoniales'];
+      const profiles = {
+        zurich:        { bruto: 1250000, com: 520000 },
+        capitales:     { bruto: 500000,  com: 300000 },
+        patrimoniales: { bruto: 850000,  com: 210000 }
+      };
+      for (let i = 5; i >= 0; i--) {
+        companies.forEach(cid => {
+          const p = profiles[cid];
+          seed.push({
+            id: 'seed-' + cid + '-' + i,
+            companyId: cid,
+            sellerEmail: carlos,
+            periodo: shiftPeriod(now, -i),
+            montoBruto: rnd(p.bruto, 120000),
+            montoComision: rnd(p.com, 60000),
+            estado: i <= 1 ? 'pendiente' : 'pagado'
+          });
+        });
+      }
+      localStorage.setItem('bells-liquidaciones', JSON.stringify(seed));
+      return seed;
+    }
+
+    /* ---------- Motor de cálculo ---------- */
+    function resolveSeller() {
+      const user = getCurrentUser();
+      const asesores = getAsesores();
+      const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\./g, '').trim();
+
+      const storedEmail = localStorage.getItem('bells_user_email');
+      const asesor =
+        asesores.find(a => storedEmail && a.email.toLowerCase() === storedEmail.toLowerCase()) ||
+        asesores.find(a => norm(a.name) === norm(user.name)) ||
+        asesores.find(a => norm(a.name).startsWith(norm(user.name)) || norm(user.name).startsWith(norm(a.name)));
+
+      const categories = getCategories();
+      const category = categories.find(c => c.id === (asesor && asesor.category)) ||
+                       categories.find(c => c.id === 'junior') || categories[0] || null;
+      return {
+        user,
+        asesor,
+        email: (asesor && asesor.email) || storedEmail || user.name,
+        category
+      };
+    }
+
+    function sellerLiquidaciones(seller) {
+      return getLiquidaciones().filter(l => l.sellerEmail === seller.email);
+    }
+
+    // Comisión promedio mensual por compañía (últimas 6 liquidaciones)
+    function avgCommissionByCompany(seller) {
+      const list = sellerLiquidaciones(seller);
+      const map = {};
+      list.forEach(l => {
+        if (!map[l.companyId]) map[l.companyId] = [];
+        map[l.companyId].push(l);
+      });
+      const out = {};
+      Object.keys(map).forEach(cid => {
+        const sorted = map[cid]
+          .filter(l => monthDiff(currentPeriod(), l.periodo) <= 12)
+          .sort((a, b) => (a.periodo < b.periodo ? -1 : 1));
+        const recent = sorted.slice(-6);
+        const avg = recent.reduce((s, l) => s + (Number(l.montoComision) || 0), 0) / Math.max(1, recent.length);
+        out[cid] = { avg, count: recent.length, items: recent };
+      });
+      return out;
+    }
+
+    // Ingreso mensual efectivo según modelo de negocio
+    function computeMonthlyIncome(seller) {
+      const byCompany = avgCommissionByCompany(seller);
+      const companies = getCompanies();
+      const category = seller.category;
+
+      const salary = (category && Number(category.sueldoBase)) || 0;
+      const absorbible = (category && Number(category.absorbible)) || 0;
+
+      let absorbiblePool = 0; // comisiones de compañías sueldo+absorbible
+      let directCommissions = 0; // solo comisión + patrimoniales
+
+      companies.forEach(c => {
+        const stat = byCompany[c.id];
+        if (!stat) return;
+        if (c.modelo === 'sueldo-absorbible') absorbiblePool += stat.avg;
+        if (c.modelo === 'solo-comision' || c.modelo === 'patrimoniales') directCommissions += stat.avg;
+      });
+
+      const absorbibleExtra = Math.max(0, absorbiblePool - absorbible);
+      const commissions = absorbibleExtra + directCommissions;
+
+      return { salary, commissions, monthly: salary + commissions, absorbiblePool, absorbibleExtra, directCommissions, byCompany };
+    }
+
+    function computePending(seller) {
+      return sellerLiquidaciones(seller)
+        .filter(l => l.estado === 'pendiente')
+        .reduce((s, l) => s + (Number(l.montoComision) || 0), 0);
+    }
+
+    /* ---------- Render ---------- */
+    let currentHorizon = CURRENT_HORIZON;
+    let incomeChart = null;
+
+    function setHorizon(key) {
+      currentHorizon = key;
+      document.querySelectorAll('#period-selector button').forEach(b => {
+        b.classList.toggle('active', b.dataset.period === key);
+      });
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      const seller = resolveSeller();
+      const income = computeMonthlyIncome(seller);
+      const pending = computePending(seller);
+      const horizon = HORIZONS[currentHorizon];
+      const projected = income.monthly * horizon.months;
+      const commissionsPeriod = income.commissions * horizon.months;
+
+      // Sidebar
+      document.getElementById('sidebar-monthly-income').textContent = fmtARS(income.monthly);
+
+      // Header
+      document.getElementById('welcome-user-name').textContent = seller.user.name;
+      const summaryEl = document.getElementById('welcome-summary-value');
+      summaryEl.textContent = fmtARS(projected);
+      document.getElementById('welcome-summary').title = 'Ingreso proyectado en ' + horizon.label;
+
+      // KPIs
+      document.getElementById('kpi-projected').textContent = fmtARS(projected);
+      document.getElementById('kpi-projected-sub').textContent = 'Horizonte: ' + horizon.label;
+      document.getElementById('kpi-commissions').textContent = fmtARS(commissionsPeriod);
+      document.getElementById('kpi-commissions-sub').textContent = 'Promedio mensual: ' + fmtARS(income.commissions);
+      document.getElementById('kpi-salary').textContent = fmtARS(income.salary);
+      document.getElementById('kpi-salary-sub').textContent = income.salary > 0 ? 'Por mes · categoría ' + (seller.category ? seller.category.nombre : '-') : 'Sin sueldo fijo (solo comisión)';
+      document.getElementById('kpi-pending').textContent = fmtARS(pending);
+      document.getElementById('kpi-pending-sub').textContent = pending > 0 ? 'Liquidaciones sin cobrar' : 'No tenés liquidaciones pendientes';
+      document.getElementById('kpi-monthly').textContent = fmtARS(income.monthly);
+      document.getElementById('kpi-monthly-sub').textContent = 'Sueldo + comisiones estimadas';
+
+      renderCompanies(income, horizon);
+      renderLiquidaciones(seller);
+      renderChart(income, seller);
+    }
+
+    function modelBadge(modelo) {
+      const m = MODELS[modelo] || { label: modelo, icon: 'domain' };
+      const color = MODEL_COLORS[modelo] || '#94A3B8';
+      return `<span class="model-badge" style="background:${color}1A; color:${color};">
+        <span class="material-symbols-outlined" style="font-size:14px;">${m.icon}</span>${m.label}</span>`;
+    }
+
+    function renderCompanies(income, horizon) {
+      const grid = document.getElementById('companies-grid');
+      const companies = getCompanies();
+      document.getElementById('companies-period-label').textContent = 'Proyección a ' + horizon.label;
+
+      if (companies.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">domain_disabled</span>Sin compañías configuradas</div>`;
+        return;
+      }
+
+      grid.innerHTML = companies.map(c => {
+        const stat = income.byCompany[c.id] || { avg: 0, count: 0 };
+        const projected = stat.avg * horizon.months;
+        const model = MODELS[c.modelo] || {};
+        const pendCount = getLiquidaciones().filter(l => l.companyId === c.id && l.estado === 'pendiente').length;
+        const pendencia = pendCount > 0
+          ? `<span class="estado-badge estado-pendiente"><span class="material-symbols-outlined" style="font-size:13px;">schedule</span>${pendCount} pendiente${pendCount > 1 ? 's' : ''}</span>`
+          : `<span class="estado-badge estado-pagado"><span class="material-symbols-outlined" style="font-size:13px;">check</span>Al día</span>`;
+
+        return `
+          <div class="company-card">
+            <div class="company-head">
+              <div class="company-icon" style="background:${c.color || MODEL_COLORS[c.modelo] || '#6E3AFF'};">
+                <span class="material-symbols-outlined">${model.icon || 'domain'}</span>
+              </div>
+              <div style="flex:1; min-width:0;">
+                <div class="company-name">${c.nombre}</div>
+                <div class="company-model">${model.label || c.modelo} · tasa ${Number(c.tasa) || 0}%</div>
+              </div>
+              ${pendencia}
+            </div>
+            <div class="company-row">
+              <span class="row-label">Comisión promedio / mes</span>
+              <span class="row-value">${fmtARS(stat.avg)}</span>
+            </div>
+            <div class="company-row">
+              <span class="row-label">Proyección a ${horizon.label}</span>
+              <span class="row-value" style="color:${c.color || '#6E3AFF'};">${fmtARS(projected)}</span>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderLiquidaciones(seller) {
+      const tbody = document.getElementById('liquidaciones-tbody');
+      const companies = getCompanies();
+      const list = sellerLiquidaciones(seller).slice().sort((a, b) => (a.periodo < b.periodo ? 1 : -1));
+      document.getElementById('liquidaciones-count').textContent = list.length + ' liquidaciones';
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">
+          <span class="material-symbols-outlined">receipt_long</span>
+          Aún no tenés liquidaciones cargadas. El administrador las carga desde el Backoffice.</div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(l => {
+        const c = companies.find(x => x.id === l.companyId) || { nombre: l.companyId, color: '#94A3B8' };
+        const badge = l.estado === 'pagado'
+          ? `<span class="estado-badge estado-pagado"><span class="material-symbols-outlined" style="font-size:13px;">check_circle</span>Pagado</span>`
+          : `<span class="estado-badge estado-pendiente"><span class="material-symbols-outlined" style="font-size:13px;">schedule</span>Pendiente</span>`;
+        return `
+          <tr>
+            <td><span style="font-weight:700;">${fmtPeriod(l.periodo)}</span></td>
+            <td><span style="display:inline-flex; align-items:center; gap:6px;">
+              <span style="width:8px; height:8px; border-radius:50%; background:${c.color || '#94A3B8'}; display:inline-block;"></span>${c.nombre}</span></td>
+            <td class="amount">${fmtARS(l.montoBruto)}</td>
+            <td class="amount" style="color:var(--md-sys-color-primary);">${fmtARS(l.montoComision)}</td>
+            <td>${badge}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    function renderChart(income, seller) {
+      const ctx = document.getElementById('incomeChart');
+      if (!ctx) return;
+
+      const now = currentPeriod();
+      const labels = [];
+      const salaryData = [];
+      const commissionData = [];
+      const byCompany = avgCommissionByCompany(seller);
+      const companies = getCompanies();
+
+      // Últimos 6 meses reales + próximos 6 proyectados
+      for (let i = 5; i >= -6; i--) {
+        const periodo = shiftPeriod(now, i);
+        labels.push(fmtPeriod(periodo));
+
+        const isPast = i >= 0;
+        if (isPast) {
+          // Comisión real del mes (suma de liquidaciones del periodo)
+          const actual = getLiquidaciones().filter(l => l.sellerEmail === seller.email && l.periodo === periodo)
+            .reduce((s, l) => s + (Number(l.montoComision) || 0), 0);
+          commissionData.push(actual);
+        } else {
+          // Proyección: comisión mensual estimada
+          commissionData.push(income.commissions);
+        }
+        salaryData.push(income.salary);
+      }
+
+      if (incomeChart) incomeChart.destroy();
+
+      incomeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Sueldo',
+              data: salaryData,
+              backgroundColor: '#D8CCFF',
+              borderRadius: 6,
+              stack: 'income'
+            },
+            {
+              label: 'Comisiones',
+              data: commissionData,
+              backgroundColor: companies.length ? companies[0].color || '#6E3AFF' : '#6E3AFF',
+              borderRadius: 6,
+              stack: 'income'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: { family: 'Inter', size: 12 } } },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return ' ' + context.dataset.label + ': ' + fmtARS(context.parsed.y);
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 }, color: '#70757A' } },
+            y: {
+              stacked: true,
+              grid: { color: '#EEF0F6' },
+              ticks: {
+                font: { family: 'Inter', size: 11 },
+                color: '#70757A',
+                callback: function (v) { return '$' + (v / 1000) + 'k'; }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    /* ---------- Sidebar / UI ---------- */
+    function toggleSidebar(force) {
+      const sidebar = document.getElementById('dashboard-col-left');
+      const isCollapsed = typeof force === 'boolean' ? force : !sidebar.classList.contains('collapsed');
+      sidebar.classList.toggle('collapsed', isCollapsed);
+      localStorage.setItem('bells-sidebar-collapsed', isCollapsed ? 'true' : 'false');
+      const btn = document.getElementById('sidebar-collapse-btn');
+      if (btn) btn.setAttribute('aria-expanded', String(!isCollapsed));
+    }
+
+    function showToast(message, type) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + (type || 'info');
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    /* ---------- Init ---------- */
+    function initUserSession() {
+      const user = getCurrentUser();
+      const displayNameEl = document.getElementById('user-display-name');
+      const displayRoleEl = document.getElementById('user-display-role');
+      const avatarEl = document.getElementById('user-avatar');
+      if (displayNameEl) displayNameEl.textContent = user.name;
+      if (displayRoleEl) displayRoleEl.textContent = user.role === 'Team Leader' ? 'Team Leader / PASS' : 'Asesor Comercial';
+      if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initUserSession();
+      renderDashboard();
+    });
+  </script>
+</body>
+</html>

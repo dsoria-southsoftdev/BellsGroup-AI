@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BellsGroup CRM - Historial Reciente</title>
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Design System Compartido -->
+  <link rel="stylesheet" href="../bells.css">
+
+  <!-- Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <style>
+    .dashboard-body {
+      background-color: var(--bg-color);
+    }
+
+    .history-card {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      max-width: 760px;
+      width: 100%;
+    }
+
+    .history-card .panel-title {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+    <aside class="sidebar-left" id="dashboard-col-left">
+      <script>if (localStorage.getItem('bells-sidebar-collapsed') === 'true') { document.getElementById('dashboard-col-left').classList.add('collapsed'); }</script>
+      <div class="sidebar-branding">
+        <div class="brand-icon">
+          <span class="material-symbols-outlined">notifications_active</span>
+        </div>
+        <span class="brand-name">BellsGroup</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-label">General</span>
+        <a href="dashboard.html" class="nav-item">
+          <span class="material-symbols-outlined">dashboard</span> <span>Dashboard</span>
+        </a>
+        <a href="Clientes.html" class="nav-item">
+          <span class="material-symbols-outlined">group</span> <span>Clientes</span>
+        </a>
+        <a href="Embudo.html" class="nav-item">
+          <span class="material-symbols-outlined">filter_alt</span> <span>Embudo de ventas</span>
+        </a>
+        <a href="Comisiones.html" class="nav-item">
+          <span class="material-symbols-outlined">payments</span> <span>Comisiones</span>
+        </a>
+        <span class="nav-label" style="margin-top: 12px;">Herramientas</span>
+        <a href="Embudo.html" class="nav-item">
+          <span class="material-symbols-outlined">person_add</span> <span>Registrar Prospecto</span>
+        </a>
+        <a href="dashboard.html#simulations" class="nav-item">
+          <span class="material-symbols-outlined">calculate</span> <span>Simulaciones</span>
+        </a>
+        <a href="dashboard.html#report" class="nav-item">
+          <span class="material-symbols-outlined">download</span> <span>Reportes</span>
+        </a>
+        <a href="Configuracion-vendedor.html" class="nav-item">
+          <span class="material-symbols-outlined">settings</span> <span>Configuración</span>
+        </a>
+        <a href="Historial reciente.html" class="nav-item active">
+          <span class="material-symbols-outlined">history</span> <span>Historial Reciente</span>
+        </a>
+      </nav>
+
+      <button id="sidebar-collapse-btn" class="sidebar-collapse-btn" onclick="toggleSidebar()" title="Colapsar sidebar" aria-controls="dashboard-col-left" aria-expanded="true">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+    </aside>
+
+    <div class="main-content">
+      <header class="top-header">
+        <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Colapsar sidebar" aria-controls="dashboard-col-left" aria-expanded="true" style="margin-right: auto;">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="zurich-status">
+          <div class="sync-dot"></div>
+          <span>Zurich Sync: OK</span>
+        </div>
+
+        <div class="user-profile">
+          <a href="../General/Mi perfil.html" class="d-flex items-center gap-10 c-inherit td-none">
+            <div class="user-avatar" id="user-avatar">C</div>
+            <div class="user-info">
+              <span class="user-name" id="user-display-name">Carlos</span>
+              <span class="user-role" id="user-display-role">Asesor Comercial</span>
+            </div>
+          </a>
+          <button class="logout-btn" onclick="logout()" title="Cerrar sesión">
+            <i class="fa-solid fa-power-off"></i>
+          </button>
+        </div>
+      </header>
+
+      <main class="dashboard-body">
+        <div class="history-card">
+          <h3 class="panel-title d-flex items-center gap-8">
+            <i class="fa-solid fa-clock-rotate-left c-primary"></i>
+            <span>Historial de Interacciones</span>
+          </h3>
+          <div class="activity-timeline" id="full-history-timeline" style="max-height: 400px; overflow-y: auto; padding-right: 4px;">
+            <!-- Cargado dinámicamente -->
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const mockActivities = [
+      { id: 1, avatar: 'CA', user: 'Carlos (Tú)', time: 'Hace 2 horas', type: 'cobrado', text: 'Pasó a <span class="dot cobrado"></span><strong>Cobrado</strong> el prospecto <strong>Marta Gómez</strong> tras confirmación de transferencia.' },
+      { id: 2, avatar: 'CA', user: 'Carlos (Tú)', time: 'Hace 3 días', type: 'prospecto', text: 'Creó cotización de Seguro de Vida para <strong>Lucía Fernández</strong>.' },
+      { id: 3, avatar: 'CA', user: 'Carlos (Tú)', time: 'Hace 1 semana', type: 'emitido', text: 'Sincronizó póliza de <strong>Pedro Almodóvar</strong> desde Zurich: Estado cambiado a <span class="dot emitido"></span><strong>Emitido</strong>.' },
+      { id: 4, avatar: 'CA', user: 'Carlos (Tú)', time: 'Hace 2 semanas', type: 'prospecto', text: 'Registró nuevo prospecto de Seguro de Retiro para <strong>Tomás Restrepo</strong>.' },
+      { id: 5, avatar: 'CA', user: 'Carlos (Tú)', time: 'Hace 3 semanas', type: 'cobrado', text: 'Cobró la primera cuota del Seguro de Retiro de <strong>Julio Martínez</strong>.' }
+    ];
+
+    function renderFullHistory() {
+      const container = document.getElementById('full-history-timeline');
+      if (!container) return;
+
+      container.innerHTML = mockActivities.map(act => `
+        <div class="activity-item" style="margin-bottom: 14px;">
+          <div class="activity-avatar">${act.avatar}</div>
+          <div class="activity-details">
+            <div class="activity-header">
+              <span class="activity-user">${act.user}</span>
+              <span class="activity-time">${act.time}</span>
+            </div>
+            <div class="activity-text">${act.text}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleSidebar(force) {
+      const sidebar = document.getElementById('dashboard-col-left');
+      const isCollapsed = typeof force === 'boolean' ? force : sidebar.classList.toggle('collapsed');
+      if (typeof force !== 'boolean') {
+        sidebar.classList.toggle('collapsed', isCollapsed);
+      } else {
+        sidebar.classList.toggle('collapsed', !isCollapsed);
+      }
+      localStorage.setItem('bells-sidebar-collapsed', sidebar.classList.contains('collapsed') ? 'true' : 'false');
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = '../General/login.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderFullHistory();
+    });
+  </script>
+</body>
+</html>

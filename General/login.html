@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BellsGroup CRM - Iniciar Sesión</title>
+  <meta name="description" content="Acceso al sistema de gestión de relaciones con clientes y embudo comercial de BellsGroup.">
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Design System Compartido (Tokens + Base + Componentes) -->
+  <link rel="stylesheet" href="../bells.css">
+
+  <style>
+    /* Estilos específicos de Login (layout centrado, OAuth, demo credentials) */
+
+    body {
+      background-color: var(--bg-color);
+      background-image: 
+          radial-gradient(at 0% 0%, rgba(224, 231, 255, 0.4) 0, transparent 50%), 
+          radial-gradient(at 100% 0%, rgba(245, 243, 255, 0.4) 0, transparent 50%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      padding: 20px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 40px 30px;
+      box-shadow: var(--shadow-premium);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .login-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 30px 40px -10px rgba(15, 23, 42, 0.12);
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: var(--radius-lg);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .brand-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .input-wrapper .form-input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      font-size: 14.5px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      outline: none;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 13.5px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      accent-color: var(--primary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .forgot-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+
+    /* Submit Button with feedback transition styling */
+    .submit-btn {
+      width: 100%;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .submit-btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Green success transition feedback */
+    .submit-btn.success-feedback {
+      background: var(--color-green) !important;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+    }
+
+    /* Demo credentials: segmented pills interactive control */
+    .demo-credentials {
+      margin-top: 25px;
+      background: var(--bg-muted);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      border: 1px solid var(--border-color);
+    }
+
+    .demo-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .demo-selector {
+      display: flex;
+      gap: 10px;
+    }
+
+    .demo-pill {
+      flex: 1;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .demo-pill:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .demo-pill-role {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: block;
+    }
+
+    .demo-pill-user {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Spinner animation */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-loading .spinner {
+      display: inline-block;
+    }
+    .btn-loading .btn-text {
+      display: none;
+    }
+
+    /* Oauth Divider */
+    .oauth-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .oauth-divider::before,
+    .oauth-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .oauth-divider:not(:empty)::before {
+      margin-right: .5em;
+    }
+
+    .oauth-divider:not(:empty)::after {
+      margin-left: .5em;
+    }
+
+    /* Google Button */
+    .google-btn {
+      width: 100%;
+      padding: 12px 24px;
+      background: var(--bg-card-solid);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .google-btn:hover {
+      background: var(--bg-muted);
+      border-color: var(--text-muted);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .google-icon-svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .google-btn .spinner {
+      border-top-color: var(--primary);
+      border-right-color: rgba(124, 58, 237, 0.2);
+      border-bottom-color: rgba(124, 58, 237, 0.2);
+      border-left-color: rgba(124, 58, 237, 0.2);
+      width: 18px;
+      height: 18px;
+    }
+
+    .google-btn.btn-loading .spinner {
+      display: inline-block;
+    }
+
+    .google-btn.btn-loading .google-icon-svg,
+    .google-btn.btn-loading .google-btn-text {
+      display: none;
+    }
+
+    /* Google Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.3);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .google-modal-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 380px;
+      padding: 32px 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .google-modal-card {
+      transform: scale(1);
+    }
+
+    .google-modal-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .google-logo-modal {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 12px;
+    }
+
+    .google-modal-header h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #202124;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .google-modal-header p {
+      font-size: 14px;
+      color: #5f6368;
+      margin-top: 4px;
+    }
+
+    .google-accounts-list {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .google-account-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      border-bottom: 1px solid #dadce0;
+    }
+
+    .google-account-item:last-child {
+      border-bottom: none;
+    }
+
+    .google-account-item:hover {
+      background-color: #f7f8f8;
+    }
+
+    .account-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #7c3aed;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      margin-right: 12px;
+    }
+
+    .account-avatar.font-carlos {
+      background: #10b981;
+    }
+
+    .account-details {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .account-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #3c4043;
+    }
+
+    .account-email {
+      font-size: 12px;
+      color: #5f6368;
+    }
+
+    .google-modal-footer {
+      font-size: 11px;
+      color: #5f6368;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    /* Apple Button */
+    .apple-btn {
+      width: 100%;
+      padding: 12px 24px;
+      background: #000000;
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      margin-top: 10px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .apple-btn:hover {
+      background: #1c1c1e;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .apple-icon-fa {
+      font-size: 18px;
+    }
+
+    .apple-btn .spinner {
+      border-top-color: white;
+      border-right-color: rgba(255, 255, 255, 0.2);
+      border-bottom-color: rgba(255, 255, 255, 0.2);
+      border-left-color: rgba(255, 255, 255, 0.2);
+      width: 18px;
+      height: 18px;
+    }
+
+    .apple-btn.btn-loading .spinner {
+      display: inline-block;
+    }
+
+    .apple-btn.btn-loading .apple-icon-fa,
+    .apple-btn.btn-loading .apple-btn-text {
+      display: none;
+    }
+
+    /* Microsoft Button */
+    .microsoft-btn {
+      width: 100%;
+      padding: 12px 24px;
+      background: #ffffff;
+      color: #323130;
+      border: 1px solid #d1d1d1;
+      border-radius: var(--radius-md);
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      margin-top: 10px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .microsoft-btn:hover {
+      background: #f3f2f1;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .microsoft-icon-fa {
+      font-size: 18px;
+      color: #00a4ef;
+    }
+
+    .microsoft-btn .spinner {
+      border-top-color: #323130;
+      border-right-color: rgba(50, 49, 48, 0.2);
+      border-bottom-color: rgba(50, 49, 48, 0.2);
+      border-left-color: rgba(50, 49, 48, 0.2);
+      width: 18px;
+      height: 18px;
+    }
+
+    .microsoft-btn.btn-loading .spinner {
+      display: inline-block;
+    }
+
+    .microsoft-btn.btn-loading .microsoft-icon-fa,
+    .microsoft-btn.btn-loading .microsoft-btn-text {
+      display: none;
+    }
+
+    /* Microsoft Modal Styles */
+    .microsoft-modal-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 380px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      color: #323130;
+    }
+
+    .modal-overlay.active .microsoft-modal-card {
+      transform: scale(1);
+    }
+
+    .microsoft-modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .microsoft-logo-modal {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #00a4ef;
+    }
+
+    .microsoft-modal-header h3 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #323130;
+      letter-spacing: -0.4px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .microsoft-modal-header p {
+      font-size: 13px;
+      color: #8a8886;
+      margin-top: 4px;
+    }
+
+    .microsoft-accounts-container {
+      background: #ffffff;
+      border: 1px solid #e1dfdd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .microsoft-account-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f3f2f1;
+      transition: background-color 0.2s ease;
+    }
+
+    .microsoft-account-option:last-child {
+      border-bottom: none;
+    }
+
+    .microsoft-account-option:hover {
+      background-color: #f3f2f1;
+    }
+
+    .microsoft-account-details {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .microsoft-account-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #323130;
+    }
+
+    .microsoft-account-email {
+      font-size: 12px;
+      color: #8a8886;
+    }
+
+    .microsoft-chevron {
+      color: #c8c6c4;
+      font-size: 12px;
+    }
+
+    /* Microsoft Dialog buttons */
+    .microsoft-modal-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .microsoft-modal-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .microsoft-modal-btn.cancel {
+      background: #f3f2f1;
+      color: #323130;
+    }
+
+    .microsoft-modal-btn.cancel:hover {
+      background: #e1dfdd;
+    }
+
+    .microsoft-modal-btn.continue {
+      background: #0067b8;
+      color: #ffffff;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .microsoft-modal-btn.continue.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .microsoft-modal-btn.continue:hover {
+      background: #005a9e;
+    }
+
+    /* Apple Modal Styles */
+    .apple-modal-card {
+      background: #f2f2f7; /* Apple system gray 6 */
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 380px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      color: #000000;
+    }
+
+    .modal-overlay.active .apple-modal-card {
+      transform: scale(1);
+    }
+
+    .apple-modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .apple-logo-modal {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #000000;
+    }
+
+    .apple-modal-header h3 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #000000;
+      letter-spacing: -0.4px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .apple-modal-header p {
+      font-size: 13px;
+      color: #8e8e93;
+      margin-top: 4px;
+    }
+
+    .apple-accounts-container {
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .apple-account-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #e5e5ea;
+      transition: background-color 0.2s ease;
+    }
+
+    .apple-account-option:last-child {
+      border-bottom: none;
+    }
+
+    .apple-account-option:hover {
+      background-color: #f2f2f7;
+    }
+
+    .apple-account-details {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .apple-account-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #000000;
+    }
+
+    .apple-account-email {
+      font-size: 12px;
+      color: #8e8e93;
+    }
+
+    .apple-chevron {
+      color: #c7c7cc;
+      font-size: 12px;
+    }
+
+    /* Privacy options */
+    .apple-privacy-box {
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: none; /* Will show after selecting account */
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .privacy-option {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #e5e5ea;
+    }
+
+    .privacy-option:last-child {
+      border-bottom: none;
+    }
+
+    .privacy-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid #c7c7cc;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: transparent;
+      font-size: 10px;
+      background: #ffffff;
+    }
+
+    .privacy-option.active .privacy-checkbox {
+      background: #007aff;
+      border-color: #007aff;
+      color: #ffffff;
+    }
+
+    .privacy-text {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .privacy-text strong {
+      font-size: 13.5px;
+      color: #000000;
+    }
+
+    .privacy-text span {
+      font-size: 11.5px;
+      color: #8e8e93;
+    }
+
+    /* Apple Dialog buttons */
+    .apple-modal-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .apple-modal-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .apple-modal-btn.cancel {
+      background: #e5e5ea;
+      color: #007aff;
+    }
+
+    .apple-modal-btn.cancel:hover {
+      background: #d1d1d6;
+    }
+
+    .apple-modal-btn.continue {
+      background: #007aff;
+      color: #ffffff;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .apple-modal-btn.continue.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .apple-modal-btn.continue:hover {
+      background: #0062cc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-card">
+      
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="fa-solid fa-bell"></i>
+        </div>
+        <h1 class="brand-title">BellsGroup</h1>
+        <p class="brand-subtitle">CRM & Embudo Comercial de Seguros</p>
+      </div>
+
+      <form id="login-form" action="../Vendedor/dashboard.html" method="GET">
+        <div class="form-group">
+          <label class="form-label" for="user-email">Correo Electrónico</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope"></i>
+            <input 
+              class="form-input" 
+              type="email" 
+              id="user-email" 
+              name="email" 
+              placeholder="nombre@bellsgroup.com" 
+              autocomplete="username" 
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="user-password">Contraseña</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock"></i>
+            <input 
+              class="form-input" 
+              type="password" 
+              id="user-password" 
+              name="password" 
+              placeholder="••••••••••••" 
+              autocomplete="current-password" 
+              required
+            >
+          </div>
+        </div>
+
+        <div class="remember-forgot">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember-me" name="remember">
+            <span>Recordarme</span>
+          </label>
+          <a href="#" class="forgot-link" onclick="alert('Por favor contacta con Juan para restaurar tu contraseña.')">Recuperar contraseña</a>
+        </div>
+
+        <button class="submit-btn" type="submit" id="submit-btn">
+          <span class="spinner"></span>
+          <span class="btn-text">Ingresar a la plataforma</span>
+        </button>
+      </form>
+
+      <div class="oauth-divider">
+        <span>o continuar con</span>
+      </div>
+
+      <button type="button" class="google-btn" id="google-btn">
+        <span class="spinner"></span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="google-icon-svg">
+        <span class="google-btn-text">Iniciar sesión con Google</span>
+      </button>
+
+      <button type="button" class="apple-btn" id="apple-btn">
+        <span class="spinner"></span>
+        <i class="fa-brands fa-apple apple-icon-fa"></i>
+        <span class="apple-btn-text">Iniciar sesión con Apple</span>
+      </button>
+
+      <button type="button" class="microsoft-btn" id="microsoft-btn">
+        <span class="spinner"></span>
+        <i class="fa-brands fa-microsoft microsoft-icon-fa"></i>
+        <span class="microsoft-btn-text">Iniciar sesión con Microsoft</span>
+      </button>
+
+      <!-- Segmented pills selector -->
+      <div class="demo-credentials">
+        <div class="demo-title">Acceso Rápido de Demostración</div>
+        <div class="demo-selector">
+          <div class="demo-pill" onclick="fillCredentials('juan@bellsgroup.com', 'juan123')">
+            <span class="demo-pill-role">Juan (Team Leader)</span>
+            <span class="demo-pill-user">juan@bellsgroup.com</span>
+          </div>
+          <div class="demo-pill" onclick="fillCredentials('carlos@bellsgroup.com', 'carlos123')">
+            <span class="demo-pill-role">Carlos (Vendedor)</span>
+            <span class="demo-pill-user">carlos@bellsgroup.com</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Google Account Selector -->
+  <div id="google-modal" class="modal-overlay">
+    <div class="google-modal-card">
+      <div class="google-modal-header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="google-logo-modal">
+        <h3>Selecciona una cuenta</h3>
+        <p>para continuar en BellsGroup</p>
+      </div>
+      <div class="google-accounts-list">
+        <div class="google-account-item" onclick="loginWithGoogleAccount('juan@bellsgroup.com', 'Juan')">
+          <div class="account-avatar">J</div>
+          <div class="account-details">
+            <span class="account-name">Juan (Team Leader)</span>
+            <span class="account-email">juan@bellsgroup.com</span>
+          </div>
+        </div>
+        <div class="google-account-item" onclick="loginWithGoogleAccount('carlos@bellsgroup.com', 'Carlos')">
+          <div class="account-avatar font-carlos">C</div>
+          <div class="account-details">
+            <span class="account-name">Carlos (Vendedor)</span>
+            <span class="account-email">carlos@bellsgroup.com</span>
+          </div>
+        </div>
+      </div>
+      <div class="google-modal-footer">
+        Para continuar, Google compartirá tu nombre, dirección de correo electrónico y foto de perfil con BellsGroup.
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Apple Account Selector -->
+  <div id="apple-modal" class="modal-overlay">
+    <div class="apple-modal-card">
+      <div class="apple-modal-header">
+        <i class="fa-brands fa-apple apple-logo-modal"></i>
+        <h3>Usar ID de Apple</h3>
+        <p>Inicia sesión en BellsGroup con tu ID de Apple</p>
+      </div>
+      
+      <!-- Account Chooser -->
+      <div class="apple-accounts-container">
+        <div class="apple-account-option" onclick="selectAppleAccount('juan@bellsgroup.com', 'Juan')">
+          <div class="apple-account-details">
+            <span class="apple-account-name">Juan (Team Leader)</span>
+            <span class="apple-account-email">juan@bellsgroup.com</span>
+          </div>
+          <i class="fa-solid fa-chevron-right apple-chevron"></i>
+        </div>
+        <div class="apple-account-option" onclick="selectAppleAccount('carlos@bellsgroup.com', 'Carlos')">
+          <div class="apple-account-details">
+            <span class="apple-account-name">Carlos (Vendedor)</span>
+            <span class="apple-account-email">carlos@bellsgroup.com</span>
+          </div>
+          <i class="fa-solid fa-chevron-right apple-chevron"></i>
+        </div>
+      </div>
+
+      <!-- Apple Privacy Options -->
+      <div class="apple-privacy-box">
+        <div class="privacy-option active" id="share-email-opt" onclick="setAppleEmailPrivacy(true)">
+          <div class="privacy-checkbox"><i class="fa-solid fa-check"></i></div>
+          <div class="privacy-text">
+            <strong>Compartir mi correo</strong>
+            <span></span>
+          </div>
+        </div>
+        <div class="privacy-option" id="hide-email-opt" onclick="setAppleEmailPrivacy(false)">
+          <div class="privacy-checkbox"><i class="fa-solid fa-check"></i></div>
+          <div class="privacy-text">
+            <strong>Ocultar mi correo</strong>
+            <span>Reenvía correos a tu dirección personal mediante un alias privado.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="apple-modal-buttons">
+        <button class="apple-modal-btn cancel" onclick="closeAppleModal()">Cancelar</button>
+        <button class="apple-modal-btn continue" id="apple-continue-btn" onclick="submitAppleLogin()">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Microsoft Account Selector -->
+  <div id="microsoft-modal" class="modal-overlay">
+    <div class="microsoft-modal-card">
+      <div class="microsoft-modal-header">
+        <i class="fa-brands fa-microsoft microsoft-logo-modal"></i>
+        <h3>Elegí una cuenta Microsoft</h3>
+        <p>Inicia sesión en BellsGroup con tu cuenta de Microsoft</p>
+      </div>
+
+      <!-- Account Chooser -->
+      <div class="microsoft-accounts-container">
+        <div class="microsoft-account-option" onclick="selectMicrosoftAccount('juan@bellsgroup.com', 'Juan')">
+          <div class="microsoft-account-details">
+            <span class="microsoft-account-name">Juan (Team Leader)</span>
+            <span class="microsoft-account-email">juan@bellsgroup.com</span>
+          </div>
+          <i class="fa-solid fa-chevron-right microsoft-chevron"></i>
+        </div>
+        <div class="microsoft-account-option" onclick="selectMicrosoftAccount('carlos@bellsgroup.com', 'Carlos')">
+          <div class="microsoft-account-details">
+            <span class="microsoft-account-name">Carlos (Vendedor)</span>
+            <span class="microsoft-account-email">carlos@bellsgroup.com</span>
+          </div>
+          <i class="fa-solid fa-chevron-right microsoft-chevron"></i>
+        </div>
+      </div>
+
+      <div class="microsoft-modal-buttons">
+        <button class="microsoft-modal-btn cancel" onclick="closeMicrosoftModal()">Cancelar</button>
+        <button class="microsoft-modal-btn continue" id="microsoft-continue-btn" onclick="submitMicrosoftLogin()">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function fillCredentials(email, password) {
+      document.getElementById('user-email').value = email;
+      document.getElementById('user-password').value = password;
+      
+      // Focus animation glow
+      const inputs = document.querySelectorAll('.form-input');
+      inputs.forEach(input => {
+        input.style.borderColor = 'var(--primary)';
+        setTimeout(() => {
+          input.style.borderColor = 'var(--border-color)';
+        }, 800);
+      });
+    }
+
+    const form = document.getElementById('login-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = submitBtn.querySelector('.btn-text');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Start loading simulation
+      submitBtn.classList.add('btn-loading');
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        // Change to successful state: Green with check
+        submitBtn.classList.remove('btn-loading');
+        submitBtn.classList.add('success-feedback');
+        btnText.innerHTML = '<i class="fa-solid fa-check"></i> ¡Acceso Concedido!';
+        btnText.style.display = 'inline-block';
+
+        setTimeout(() => {
+          const email = document.getElementById('user-email').value;
+          const isJuan = email.includes('juan');
+          
+          localStorage.setItem('bells_user_role', isJuan ? 'Team Leader' : 'Asesor');
+          localStorage.setItem('bells_user_name', isJuan ? 'Juan' : 'Carlos');
+          
+          if (isJuan) {
+            window.location.href = "../Backoffice/Dashboard general.html";
+          } else {
+            window.location.href = "../Vendedor/dashboard.html";
+          }
+        }, 800);
+      }, 1000);
+    });
+
+    // Google Sign-In interactive logic
+    const googleBtn = document.getElementById('google-btn');
+    const googleModal = document.getElementById('google-modal');
+    
+    googleBtn.addEventListener('click', () => {
+      googleModal.classList.add('active');
+    });
+
+    googleModal.addEventListener('click', (e) => {
+      if (e.target === googleModal) {
+        googleModal.classList.remove('active');
+      }
+    });
+
+    function loginWithGoogleAccount(email, name) {
+      googleModal.classList.remove('active');
+      
+      // Show loading feedback on Google button
+      googleBtn.classList.add('btn-loading');
+      googleBtn.disabled = true;
+      
+      setTimeout(() => {
+        googleBtn.classList.remove('btn-loading');
+        const googleBtnText = googleBtn.querySelector('.google-btn-text');
+        
+        // Show success animation check
+        googleBtn.innerHTML = '<i class="fa-solid fa-check c-green"></i> <span class="c-green fw-600">¡Acceso Concedido con Google!</span>';
+        googleBtn.style.backgroundColor = 'var(--color-green-bg)';
+        googleBtn.style.borderColor = 'var(--color-green)';
+        
+        setTimeout(() => {
+          const isJuan = email.includes('juan');
+          localStorage.setItem('bells_user_role', isJuan ? 'Team Leader' : 'Asesor');
+          localStorage.setItem('bells_user_name', name);
+          
+          if (isJuan) {
+            window.location.href = "../Backoffice/Dashboard general.html";
+          } else {
+            window.location.href = "../Vendedor/dashboard.html";
+          }
+        }, 800);
+      }, 1200);
+    }
+
+    // Apple Sign-In interactive logic
+    let selectedAppleEmail = '';
+    let selectedAppleName = '';
+    let shareAppleEmail = true;
+
+    const appleBtn = document.getElementById('apple-btn');
+    const appleModal = document.getElementById('apple-modal');
+    const shareEmailOpt = document.getElementById('share-email-opt');
+    const hideEmailOpt = document.getElementById('hide-email-opt');
+    const appleContinueBtn = document.getElementById('apple-continue-btn');
+    const privacyBox = document.querySelector('.apple-privacy-box');
+
+    appleBtn.addEventListener('click', () => {
+      appleModal.classList.add('active');
+    });
+
+    appleModal.addEventListener('click', (e) => {
+      if (e.target === appleModal) {
+        closeAppleModal();
+      }
+    });
+
+    function closeAppleModal() {
+      appleModal.classList.remove('active');
+      selectedAppleEmail = '';
+      selectedAppleName = '';
+      privacyBox.style.display = 'none';
+      appleContinueBtn.classList.remove('active');
+      document.querySelectorAll('.apple-account-option').forEach(el => {
+        el.style.backgroundColor = '';
+      });
+    }
+
+    function selectAppleAccount(email, name) {
+      selectedAppleEmail = email;
+      selectedAppleName = name;
+      
+      // Update UI selection highlights
+      document.querySelectorAll('.apple-account-option').forEach(el => {
+        if (el.textContent.includes(email)) {
+          el.style.backgroundColor = '#e5e5ea';
+        } else {
+          el.style.backgroundColor = '';
+        }
+      });
+
+      // Update email label in privacy options
+      shareEmailOpt.querySelector('.privacy-text span').textContent = email;
+      
+      // Show privacy selection box
+      privacyBox.style.display = 'block';
+      
+      // Activate continue button
+      appleContinueBtn.classList.add('active');
+    }
+
+    function setAppleEmailPrivacy(share) {
+      shareAppleEmail = share;
+      if (share) {
+        shareEmailOpt.classList.add('active');
+        hideEmailOpt.classList.remove('active');
+      } else {
+        shareEmailOpt.classList.remove('active');
+        hideEmailOpt.classList.add('active');
+      }
+    }
+
+    function submitAppleLogin() {
+      if (!selectedAppleEmail) return;
+      appleModal.classList.remove('active');
+
+      // Show loading feedback on Apple button
+      appleBtn.classList.add('btn-loading');
+      appleBtn.disabled = true;
+
+      // Final email logic
+      const finalEmail = shareAppleEmail 
+        ? selectedAppleEmail 
+        : `private-${selectedAppleName.toLowerCase()}@privaterelay.appleid.com`;
+
+      setTimeout(() => {
+        appleBtn.classList.remove('btn-loading');
+        
+        // Show success animation check
+        appleBtn.innerHTML = '<i class="fa-solid fa-check c-green"></i> <span class="c-green fw-600">¡Acceso Concedido con Apple!</span>';
+        appleBtn.style.backgroundColor = 'var(--color-green-bg)';
+        appleBtn.style.color = 'var(--color-green-text)';
+        appleBtn.style.border = '1px solid var(--color-green)';
+
+        setTimeout(() => {
+          const isJuan = selectedAppleEmail.includes('juan');
+          localStorage.setItem('bells_user_role', isJuan ? 'Team Leader' : 'Asesor');
+          localStorage.setItem('bells_user_name', selectedAppleName);
+          localStorage.setItem('bells_user_email', finalEmail);
+
+          if (isJuan) {
+            window.location.href = "../Backoffice/Dashboard general.html";
+          } else {
+            window.location.href = "../Vendedor/dashboard.html";
+          }
+        }, 800);
+      }, 1500);
+    }
+
+    // Microsoft Sign-In interactive logic
+    let selectedMicrosoftEmail = '';
+    let selectedMicrosoftName = '';
+
+    const microsoftBtn = document.getElementById('microsoft-btn');
+    const microsoftModal = document.getElementById('microsoft-modal');
+    const microsoftContinueBtn = document.getElementById('microsoft-continue-btn');
+
+    microsoftBtn.addEventListener('click', () => {
+      microsoftModal.classList.add('active');
+    });
+
+    microsoftModal.addEventListener('click', (e) => {
+      if (e.target === microsoftModal) {
+        closeMicrosoftModal();
+      }
+    });
+
+    function closeMicrosoftModal() {
+      microsoftModal.classList.remove('active');
+      selectedMicrosoftEmail = '';
+      selectedMicrosoftName = '';
+      microsoftContinueBtn.classList.remove('active');
+      document.querySelectorAll('.microsoft-account-option').forEach(el => {
+        el.style.backgroundColor = '';
+      });
+    }
+
+    function selectMicrosoftAccount(email, name) {
+      selectedMicrosoftEmail = email;
+      selectedMicrosoftName = name;
+
+      // Update UI selection highlights
+      document.querySelectorAll('.microsoft-account-option').forEach(el => {
+        if (el.textContent.includes(email)) {
+          el.style.backgroundColor = '#f3f2f1';
+        } else {
+          el.style.backgroundColor = '';
+        }
+      });
+
+      // Activate continue button
+      microsoftContinueBtn.classList.add('active');
+    }
+
+    function submitMicrosoftLogin() {
+      if (!selectedMicrosoftEmail) return;
+      microsoftModal.classList.remove('active');
+
+      // Show loading feedback on Microsoft button
+      microsoftBtn.classList.add('btn-loading');
+      microsoftBtn.disabled = true;
+
+      setTimeout(() => {
+        microsoftBtn.classList.remove('btn-loading');
+
+        // Show success animation check
+        microsoftBtn.innerHTML = '<i class="fa-solid fa-check c-green"></i> <span class="c-green fw-600">¡Acceso Concedido con Microsoft!</span>';
+        microsoftBtn.style.backgroundColor = 'var(--color-green-bg)';
+        microsoftBtn.style.color = 'var(--color-green-text)';
+        microsoftBtn.style.border = '1px solid var(--color-green)';
+
+        setTimeout(() => {
+          const isJuan = selectedMicrosoftEmail.includes('juan');
+          localStorage.setItem('bells_user_role', isJuan ? 'Team Leader' : 'Asesor');
+          localStorage.setItem('bells_user_name', selectedMicrosoftName);
+          localStorage.setItem('bells_user_email', selectedMicrosoftEmail);
+
+          if (isJuan) {
+            window.location.href = "../Backoffice/Dashboard general.html";
+          } else {
+            window.location.href = "../Vendedor/dashboard.html";
+          }
+        }, 800);
+      }, 1500);
+    }
+  </script>
+  <!-- Tema compartido (persistencia dark/light) -->
+  <script src="../theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,2480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BellsGroup CRM - Supervisión Backoffice</title>
+  <meta name="description" content="Módulo de supervisión macro para Team Leaders y PASS de BellsGroup.">
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Design System Compartido (Tokens + Base + Componentes) -->
+  <link rel="stylesheet" href="../bells.css">
+  
+  <style>/* 3-Column Architecture Central Layout */
+    .layout-central {
+      display: grid;
+      grid-template-columns: 280px 1fr 400px;
+      gap: 20px;
+      padding: 20px 30px;
+      flex: 1;
+      width: 100%;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    /* Cards & Panels */
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Left Column: Quick search & macro summary metrics */
+    .col-left {
+      align-self: start;
+    }
+    .macro-metric-card {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 12px;
+    }
+    .macro-metric-card:last-child {
+      margin-bottom: 0;
+    }
+    .macro-metric-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .macro-metric-val {
+      font-size: 22px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+    .macro-metric-footer {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Right Column: ZurichSync / PASS Approvals Contextual Panel */
+    .col-right {
+      display: flex;
+      flex-direction: column;
+      align-self: start;
+    }
+
+    /* Center Column: Advisor list & Team charts */
+    .col-center {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Advisors stats table */
+    .advisor-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .advisor-table th {
+      text-align: left;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .advisor-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13.5px;
+    }
+    .advisor-table tr:last-child td {
+      border-bottom: none;
+    }
+    .advisor-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .adv-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    .progress-bar-sm {
+      height: 5px;
+      background: var(--bg-muted);
+      border-radius: var(--radius-pill);
+      width: 60px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: var(--radius-pill);
+    }
+
+    /* Approval Queue card items */
+    .sync-queue {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sync-item {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .sync-item:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    .sync-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+    }
+    .client-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .client-info p {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .client-premium {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 14px;
+    }
+    .sync-docs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .sync-doc-chip {
+      background: var(--color-green-bg);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--color-green-text);
+      border-radius: var(--radius-sm);
+      padding: 2px 6px;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+    .sync-doc-chip.missing {
+      background: var(--color-red-bg);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: var(--color-red-text);
+    }
+    .sync-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      padding-top: 8px;
+    }
+    .btn-emit {
+      padding: 6px 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-emit:hover {
+      background: var(--primary-hover);
+    }
+    .btn-emit.success-feedback {
+      background: var(--color-green) !important;
+    }
+    .status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+    }
+    .status-badge.pass {
+      background: var(--color-yellow-bg);
+      color: var(--color-yellow-text);
+    }
+
+    /* SVG Charting & Analysis visual details */
+    .bi-visuals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .bi-chart-card {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bi-chart-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+    }
+    
+    /* Conic Donut simulated chart - Icons Removed */
+    .donut-chart-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: auto 0;
+    }
+    .donut-chart {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--primary) 0% 55%, 
+        var(--color-blue) 55% 80%, 
+        var(--color-yellow) 80% 100%
+      );
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+    .donut-chart::before {
+      content: '';
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      background: var(--bg-card-solid);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .donut-legends {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11.5px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* SVG Bars visualization */
+    .bars-chart-wrapper {
+      height: 80px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding-top: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .chart-bar-col {
+      width: 24px;
+      background: var(--primary);
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      position: relative;
+      transition: height 0.3s ease;
+      cursor: pointer;
+    }
+    .chart-bar-col:hover {
+      background: var(--primary-hover);
+    }
+    .chart-bar-col::after {
+      content: attr(data-val);
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .chart-bar-labels {
+      display: flex;
+      justify-content: space-around;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* Supervision Filters */
+    .filter-selector {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      outline: none;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    /* Supervision Alerts Card styling */
+    .alerts-card {
+      background: var(--color-yellow-bg);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      color: var(--color-yellow-text);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      box-shadow: var(--shadow-sm);
+    }
+    .alerts-card i {
+      font-size: 18px;
+      margin-top: 2px;
+    }
+    .alerts-content h5 {
+      font-weight: 700;
+      color: var(--color-yellow-text);
+      margin-bottom: 2px;
+    }
+
+    /* Team activity logs */
+    .team-activity-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .timeline-item {
+      display: flex;
+      gap: 12px;
+      position: relative;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: 32px;
+      bottom: -14px;
+      width: 1px;
+      background: var(--border-color);
+    }
+    .timeline-item:last-child::before {
+      display: none;
+    }
+    .timeline-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      z-index: 2;
+    }
+    .timeline-body {
+      flex: 1;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13px;
+      box-shadow: var(--shadow-sm);
+    }
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .timeline-user {
+      font-weight: 700;
+    }
+    .timeline-time {
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+    .timeline-text {
+      color: var(--text-secondary);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-loading .spinner { display: inline-block; }
+    .btn-loading .btn-text { display: none; }
+
+    /* Dialog/Modal Styles for Activity Log Audits */
+    dialog::backdrop {
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    dialog {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      background: white;
+      box-shadow: var(--shadow-premium);
+      padding: 24px;
+      max-width: 550px;
+      width: 90%;
+      margin: auto;
+      outline: none;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+    .modal-close:hover {
+      color: var(--color-red);
+    }
+    .modal-body {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-body strong {
+      color: var(--text-primary);
+    }
+    .modal-footer {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .modal-btn {
+      padding: 8px 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modal-btn:hover {
+      background: var(--primary-hover);
+    }
+    .view-act-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+    .view-act-btn:hover {
+      background: var(--primary-light);
+      color: var(--primary-hover);
+    }
+
+    /* Estilos Dark Mode Variables & Sobreescrituras */
+    body.dark-theme {
+      --bg-color: #0b0f19;
+      --bg-card: rgba(22, 30, 49, 0.8);
+      --bg-card-solid: #161e31;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: #26334d;
+      --bg-muted: #1a2336;
+      --primary-light: rgba(124, 58, 237, 0.12);
+    }
+    
+    /* Scorecard Grid (4 KPIs) */
+    .scorecard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent;
+      transition: background 0.3s ease;
+    }
+
+    .kpi-card.violet::after { background: var(--primary); }
+    .kpi-card.green::after { background: var(--color-green); }
+    .kpi-card.blue::after { background: var(--color-blue); }
+    .kpi-card.yellow::after { background: var(--color-yellow); }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .kpi-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .kpi-card:hover .kpi-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .kpi-icon.violet { background: var(--primary-light); color: var(--primary); }
+    .kpi-icon.green { background: var(--color-green-bg); color: var(--color-green-text); }
+    .kpi-icon.blue { background: var(--color-blue-bg); color: var(--color-blue-text); }
+    .kpi-icon.yellow { background: var(--color-yellow-bg); color: var(--color-yellow-text); }
+
+    .kpi-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .kpi-footer {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kpi-trend {
+      font-weight: 700;
+    }
+    .kpi-trend.pos { color: var(--color-green-text); }
+    .kpi-trend.neg { color: var(--color-red-text); }
+
+    /* AI Search Panel Styling */
+    .ai-search-panel {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 243, 255, 0.95) 100%);
+      border: 1px solid rgba(124, 58, 237, 0.2);
+      box-shadow: var(--shadow-sm), 0 0 15px rgba(124, 58, 237, 0.05);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    body.dark-theme .ai-search-panel {
+      background: linear-gradient(135deg, rgba(22, 30, 49, 0.95) 0%, rgba(26, 35, 54, 0.95) 100%);
+      border-color: rgba(124, 58, 237, 0.35);
+    }
+
+    .ai-search-panel:hover {
+      border-color: rgba(124, 58, 237, 0.4);
+      box-shadow: var(--shadow-md), 0 0 20px rgba(124, 58, 237, 0.15);
+    }
+
+    .ai-search-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ai-search-input-wrapper {
+      position: relative;
+      display: flex;
+      gap: 10px;
+    }
+
+    .ai-search-input-wrapper i.ai-sparkle-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      font-size: 15px;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(1); }
+      50% { opacity: 1; transform: translateY(-50%) scale(1.2); filter: drop-shadow(0 0 3px var(--primary)); }
+    }
+
+    .ai-search-input {
+      flex: 1;
+      min-height: 48px;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      outline: none;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ai-search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15), var(--shadow-md);
+    }
+
+    .ai-search-btn {
+      min-height: 48px;
+      padding: 0 20px;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .ai-search-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+      opacity: 0.95;
+    }
+
+    .ai-search-btn:active {
+      transform: translateY(1px);
+    }
+
+    .ai-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .ai-suggestions-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ai-suggestion-chip {
+      background: rgba(124, 58, 237, 0.04);
+      border: 1px solid rgba(124, 58, 237, 0.1);
+      color: var(--text-secondary);
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .ai-suggestion-chip:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ai-searching-loader {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--primary-light);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(124, 58, 237, 0.15);
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-top: 4px;
+      animation: pulse-loader 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse-loader {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+
+    .ai-loader-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(124, 58, 237, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .ai-results-card {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-top: 4px;
+      box-shadow: var(--shadow-md);
+      animation: slideDownIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideDownIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ai-results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ai-results-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ai-results-count {
+      font-size: 11px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+    }
+
+    .ai-results-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 2px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ai-results-close:hover {
+      color: var(--text-primary);
+      background: var(--bg-muted);
+    }
+
+    .ai-results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ai-result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--bg-muted);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+
+    .ai-result-item:hover {
+      border-color: var(--primary);
+      background: var(--bg-card-solid);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ai-result-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .ai-result-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .ai-result-detail {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .ai-result-tag {
+      font-size: 10.5px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .ai-result-tag.red {
+      background: var(--color-red-bg);
+      color: var(--color-red-text);
+    }
+
+    .ai-result-tag.green {
+      background: var(--color-green-bg);
+      color: var(--color-green-text);
+    }
+
+    /* Target Goal Gauge container */
+    .target-gauge-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0;
+      position: relative;
+    }
+
+    .gauge-svg {
+      width: 140px;
+      height: 140px;
+      transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: var(--bg-muted);
+      stroke-width: 10;
+    }
+
+    .gauge-progress {
+      fill: none;
+      stroke: url(#primaryGrad);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 377;
+      stroke-dashoffset: 377;
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .gauge-center-text {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .gauge-percentage {
+      font-size: 24px;
+      font-weight: 800;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--primary);
+    }
+
+    .gauge-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .goal-input-box {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .goal-input-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .goal-input-wrapper {
+      display: flex;
+      align-items: center;
+      background: var(--bg-muted);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+
+    .goal-currency {
+      color: var(--text-secondary);
+      font-weight: 700;
+      margin-right: 6px;
+      font-size: 15px;
+    }
+
+    .goal-input {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 700;
+      outline: none;
+      width: 100%;
+    }
+
+    .calc-inputs-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .calc-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .calc-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .calc-label {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .calc-value {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .calc-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: var(--radius-pill);
+      background: var(--border-color);
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    .calc-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid white;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
+      transition: transform 0.15s, background-color 0.15s;
+    }
+
+    .calc-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background-color: var(--primary-hover);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .result-box {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .result-box.highlighted {
+      background: var(--primary-light);
+      border-color: rgba(124, 58, 237, 0.2);
+      grid-column: span 2;
+    }
+
+    .result-title {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    .result-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .result-box.highlighted .result-value {
+      color: var(--primary);
+      font-size: 22px;
+    }
+
+    #goal-status-box {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      font-weight: 700;
+      font-size: 12.5px;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="brand-section">
+      <div class="brand-icon">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <span class="brand-name">BellsGroup</span>
+    </div>
+
+    <div class="nav-links">
+      <a href="Dashboard general.html" class="nav-link active">Dashboard</a>
+      <a href="Embudo vendedores.html" class="nav-link">Embudo de venta</a>
+      <a href="Configuracion-Backoffice.html" class="nav-link">Configuraciones</a>
+    </div>
+
+    <div class="nav-actions">
+      <div class="backoffice-badge">
+        <i class="fa-solid fa-user-shield"></i>
+        <span>Productor PASS (Juan)</span>
+      </div>
+
+      <div class="user-profile">
+        <a href="../General/Mi perfil.html" class="d-flex items-center gap-10 c-inherit td-none">
+          <div class="user-avatar" id="user-avatar">J</div>
+          <div class="user-info">
+            <span class="user-name" id="user-display-name">Juan</span>
+            <span class="user-role" id="user-display-role">Team Leader</span>
+          </div>
+        </a>
+        <button class="logout-btn" onclick="localStorage.clear(); window.location.href='../General/login.html'" title="Cerrar sesión">
+          <i class="fa-solid fa-power-off"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Central Layout (3-Column Architecture) -->
+  <main class="layout-central">
+    
+    <!-- COL 1 (LEFT SIDEBAR): Search, Macro Targets & Campaigns -->
+    <aside class="col-left d-flex-col gap-20">
+      
+      <!-- Panel: Monitoreo Colectivo -->
+      <div class="panel">
+        <div class="panel-title">Monitoreo Colectivo</div>
+        
+        <div class="macro-metric-card">
+          <span class="macro-metric-title">Producción Q3</span>
+          <div class="macro-metric-val">$340,000</div>
+          <div class="macro-metric-footer">Meta: $500,000 (68%)</div>
+        </div>
+
+        <div class="macro-metric-card">
+          <span class="macro-metric-title">Tasa Conversión Promedio</span>
+          <div class="macro-metric-val">14.8%</div>
+          <div class="macro-metric-footer">Tasa global esfuerzo a cierre</div>
+        </div>
+
+        <div class="macro-metric-card">
+          <span class="macro-metric-title">Días Restantes Campaña</span>
+          <div class="macro-metric-val c-red">3 Días</div>
+          <div class="macro-metric-footer" style="color: var(--color-red-text); font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Cierre Urgente Q3</div>
+        </div>
+      </div>
+
+      <!-- Panel: Campañas e Incentivos -->
+      <div class="panel">
+        <div class="panel-title mb-12">
+          <span>Incentivos y Premios</span>
+        </div>
+        
+        <div class="d-flex-col gap-12">
+          <div>
+            <label class="form-label" style="font-size:11px; margin-bottom:4px; font-weight:700; color:var(--text-secondary); display:block;">Seleccionar Campaña</label>
+            <select id="campaign-select" class="filter-selector" style="width:100%; box-sizing:border-box;" onchange="toggleCampaign(this.value)">
+              <option value="zurich-vida">Campaña Zurich Vida (Viaje)</option>
+              <option value="bells-auto">Incentivo Interno Auto (Bono)</option>
+              <option value="salud-pro">Campaña Salud Pro (Macbook)</option>
+            </select>
+          </div>
+
+          <div style="background:var(--bg-muted); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px;">
+              <span>Premio Campaña</span>
+              <span id="camp-reward-badge" style="background:var(--primary-light); padding:2px 6px; border-radius:var(--radius-sm); font-size:10px;"><i class="fa-solid fa-plane"></i> Viaje</span>
+            </div>
+            <h4 id="camp-reward-name" style="font-size:13.5px; font-weight:800; margin-top:6px; color:var(--text-primary); margin-bottom:0;">Viaje Todo Pago a Suiza</h4>
+            
+            <div class="mt-12">
+              <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:4px; color:var(--text-primary);">
+                <span>Progreso Colectivo</span>
+                <span id="camp-progress-text">38 / 50 Pólizas</span>
+              </div>
+              <div class="progress-bar-sm" style="width:100%; height:8px;"><div class="progress-fill" id="camp-progress-fill" style="width: 76%; background:var(--primary);"></div></div>
+            </div>
+
+            <!-- Contribución de Vendedores -->
+            <div style="margin-top:14px; border-top:1px solid var(--border-color); padding-top:10px;">
+              <span style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:8px; letter-spacing:0.5px;">Aportes al Premio</span>
+              <div style="display:flex; flex-direction:column; gap:6px; font-size:11.5px;" id="camp-contributors">
+                <!-- Dinámico -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- COL 2 (CENTER): Table, BI Visuals, Alerts, Team Timeline -->
+    <section class="col-center">
+      
+      <!-- Alerta de Rendimiento de Asesores -->
+      <div class="alerts-card mb-0">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div class="alerts-content">
+          <h5>Alerta de Rendimiento de Asesores</h5>
+          <p>El asesor <strong>Pedro A.</strong> registra una conversión del <strong>6.6%</strong>, por debajo del umbral mínimo del equipo (10%). Se recomienda programar una sesión de revisión y speech de ventas.</p>
+        </div>
+      </div>
+
+      <!-- Buscador Inteligente con IA (Supervisor Tool) -->
+      <div class="panel ai-search-panel">
+        <div class="ai-search-container">
+          <div class="ai-suggestions-title" style="margin-bottom: -4px;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Búsqueda Inteligente del Equipo con IA</span>
+          </div>
+          
+          <div class="ai-search-input-wrapper">
+            <i class="fa-solid fa-wand-magic-sparkles ai-sparkle-icon"></i>
+            <input type="text" id="ai-search-input" class="ai-search-input" placeholder="Pregúntale a la IA (ej. 'prospectos de Carlos sin contacto' o 'ventas de Ana de alto valor')..." onkeypress="handleAiSearchKeyPress(event)">
+            <button class="ai-search-btn" id="ai-search-btn" onclick="executeAiSearch()">
+              <i class="fa-solid fa-robot"></i>
+              <span>Consultar</span>
+            </button>
+          </div>
+
+          <div class="ai-suggestions">
+            <span class="ai-suggestions-title">Sugerencias:</span>
+            <button type="button" class="ai-suggestion-chip" onclick="applyAiSuggestion('Ver prospectos de Carlos sin contacto hace 2 semanas')">
+              <i class="fa-solid fa-calendar-xmark"></i>
+              <span>Carlos: Sin contacto hace 2 semanas</span>
+            </button>
+            <button type="button" class="ai-suggestion-chip" onclick="applyAiSuggestion('Ver ventas de Ana con primas mayores a 3000 USD')">
+              <i class="fa-solid fa-dollar-sign"></i>
+              <span>Ana: Ventas > $3,000 USD</span>
+            </button>
+          </div>
+
+          <!-- Loading Indicator -->
+          <div class="ai-searching-loader" id="ai-search-loader">
+            <div class="ai-loader-spinner"></div>
+            <span>La IA está analizando los datos del equipo comercial...</span>
+          </div>
+
+          <!-- Results Box -->
+          <div class="ai-results-card" id="ai-results-card">
+            <div class="ai-results-header">
+              <span class="ai-results-title">
+                <i class="fa-solid fa-robot"></i>
+                <span>Resultados de Supervisión IA</span>
+              </span>
+              <div class="d-flex items-center gap-8">
+                <span class="ai-results-count" id="ai-results-count">0</span>
+                <button type="button" class="ai-results-close" onclick="closeAiResults()">&times;</button>
+              </div>
+            </div>
+            <div class="ai-results-list" id="ai-results-list">
+              <!-- Cargado dinámicamente -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Scorecard de Supervisión (4 KPIs) -->
+      <div class="scorecard-grid">
+        <div class="kpi-card violet">
+          <div class="kpi-header">
+            <span class="kpi-title">Producción del Equipo</span>
+            <div class="kpi-icon violet">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpi-team-production">$340,000</div>
+          <div class="kpi-footer">
+            <span>Volumen de primas acumulado</span>
+          </div>
+        </div>
+
+        <div class="kpi-card green">
+          <div class="kpi-header">
+            <span class="kpi-title">Comisiones Estimadas</span>
+            <div class="kpi-icon green">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpi-team-commissions">$136,000</div>
+          <div class="kpi-footer">
+            <span>Basado en 40% promedio</span>
+          </div>
+        </div>
+
+        <div class="kpi-card blue">
+          <div class="kpi-header">
+            <span class="kpi-title">Conversión Promedio</span>
+            <div class="kpi-icon blue">
+              <i class="fa-solid fa-percent"></i>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpi-team-conversion">14.8%</div>
+          <div class="kpi-footer">
+            <span>Tasa de cierre colectiva</span>
+          </div>
+        </div>
+
+        <div class="kpi-card yellow">
+          <div class="kpi-header">
+            <span class="kpi-title">Asesores en Actividad</span>
+            <div class="kpi-icon yellow">
+              <i class="fa-solid fa-users"></i>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpi-team-active">3 Activos</div>
+          <div class="kpi-footer">
+            <span>Carlos, Ana y Pedro</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 1: Table -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>Desempeño de Asesores</span>
+          <select id="adv-period-select" class="filter-selector" onchange="renderAdvisorPerformance(this.value)">
+            <option value="dia">Día</option>
+            <option value="semana">Semana</option>
+            <option value="quincena">Quincena</option>
+            <option value="mes" selected>Mes</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="anual">Anual</option>
+          </select>
+        </div>
+        <table class="advisor-table">
+          <thead>
+            <tr>
+              <th>Asesor</th>
+              <th>Contactos</th>
+              <th>Cierres</th>
+              <th>Conversión</th>
+              <th>Meta Q3</th>
+            </tr>
+          </thead>
+          <tbody id="advisor-table-body">
+            <!-- Cargado dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Panel 2: BI Business Intelligence Visuals (Period Filter Added) -->
+      <div class="panel">
+        <div class="panel-title">Análisis de Producción y Métricas Visuales</div>
+        
+        <div class="bi-visuals-grid">
+          <!-- Donut chart for Nicho distribution - Emojis removed -->
+          <div class="bi-chart-card">
+            <span class="bi-chart-title">Producción por Nicho de Red</span>
+            <div class="donut-chart-container">
+              <div class="donut-chart"></div>
+              <div class="donut-legends">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--primary);"></span><span>Médicos (55%)</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--color-blue);"></span><span>Empresas (25%)</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--color-yellow);"></span><span>Legal (20%)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly Sales Chart with Period filter dropdown -->
+          <div class="bi-chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+              <span class="bi-chart-title" id="prod-chart-title">Producción Semanal</span>
+              <select id="prod-period-select" class="filter-selector" onchange="toggleChartPeriod(this.value)">
+                <option value="semanal" selected>Semanal</option>
+                <option value="quincena">Quincena</option>
+                <option value="mensual">Mensual</option>
+                <option value="trimestre">Trimestre</option>
+                <option value="anio">Año</option>
+              </select>
+            </div>
+            
+            <div class="bars-chart-wrapper" id="bars-wrapper">
+              <!-- Default values (Mes) -->
+              <div class="chart-bar-col" style="height: 30%;" data-val="$15k"></div>
+              <div class="chart-bar-col" style="height: 55%;" data-val="$28k"></div>
+              <div class="chart-bar-col" style="height: 85%;" data-val="$42k"></div>
+              <div class="chart-bar-col" style="height: 65%;" data-val="$32k"></div>
+            </div>
+            <div class="chart-bar-labels" id="bars-labels">
+              <span>Sem 1</span>
+              <span>Sem 2</span>
+              <span>Sem 3</span>
+              <span>Sem 4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- COL 3 (RIGHT SIDEBAR)    <!-- COL 3 (RIGHT SIDEBAR): Simulator & Consolidated team timeline history -->
+    <aside class="col-right" style="display:flex; flex-direction:column; gap:20px; align-self:start;">
+      
+      <!-- Simulador de Objetivos del Equipo -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>Simulador de Objetivos del Equipo</span>
+          <i class="fa-solid fa-calculator"></i>
+        </div>
+
+        <!-- Target Goal Visual Progress Gauge -->
+        <div class="target-gauge-container">
+          <svg class="gauge-svg" viewBox="0 0 140 140">
+            <defs>
+              <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7c3aed" />
+                <stop offset="100%" stop-color="#6d28d9" />
+              </linearGradient>
+            </defs>
+            <circle class="gauge-bg" cx="70" cy="70" r="60" />
+            <circle class="gauge-progress" id="gauge-progress" cx="70" cy="70" r="60" />
+          </svg>
+          <div class="gauge-center-text">
+            <span class="gauge-percentage" id="gauge-percent">0%</span>
+            <span class="gauge-label">Meta Equipo</span>
+          </div>
+        </div>
+
+        <!-- Goal input box -->
+        <div class="goal-input-box">
+          <label class="goal-input-label" for="target-monthly-income">Meta Mensual Equipo ($ USD)</label>
+          <div class="goal-input-wrapper">
+            <span class="goal-currency">$</span>
+            <input type="number" id="target-monthly-income" class="goal-input" value="50000" min="1000" max="500000" step="1000" oninput="calculateTeamProjections()">
+          </div>
+        </div>
+
+        <div class="calc-inputs-stack">
+          <div class="calc-input-group">
+            <div class="calc-label-row">
+              <span class="calc-label">Contactos / Asesor / Sem</span>
+              <span class="calc-value" id="val-contacts">30</span>
+            </div>
+            <input type="range" id="slider-contacts" class="calc-slider" min="5" max="100" value="30" oninput="calculateTeamProjections()">
+          </div>
+
+          <div class="calc-input-group">
+            <div class="calc-label-row">
+              <span class="calc-label">Conversión Promedio</span>
+              <span class="calc-value" id="val-conversion">15%</span>
+            </div>
+            <input type="range" id="slider-conversion" class="calc-slider" min="1" max="50" value="15" oninput="calculateTeamProjections()">
+          </div>
+
+          <div class="calc-input-group">
+            <div class="calc-label-row">
+              <span class="calc-label">Prima Promedio</span>
+              <span class="calc-value" id="val-premium-avg">$1,500</span>
+            </div>
+            <input type="range" id="slider-premium-avg" class="calc-slider" min="200" max="10000" step="100" value="1500" oninput="calculateTeamProjections()">
+          </div>
+
+          <div class="calc-input-group">
+            <div class="calc-label-row">
+              <span class="calc-label">Comisión Bells Prom.</span>
+              <span class="calc-value" id="val-commission">40%</span>
+            </div>
+            <input type="range" id="slider-commission" class="calc-slider" min="10" max="90" value="40" oninput="calculateTeamProjections()">
+          </div>
+        </div>
+
+        <!-- Calculation Breakdown -->
+        <div class="results-grid">
+          <div class="result-box highlighted">
+            <div class="result-title">Ingreso Mensual Equipo</div>
+            <div class="result-value" id="res-monthly-income">$11,700</div>
+          </div>
+          <div class="result-box">
+            <div class="result-title">Prima Anual Proyectada</div>
+            <div class="result-value" id="res-annual-premium">$351,000</div>
+          </div>
+          <div class="result-box">
+            <div class="result-title">Cierres Totales / Mes</div>
+            <div class="result-value" id="res-sales-needed">19.5</div>
+          </div>
+        </div>
+        
+        <div id="goal-status-box">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+      <!-- Actividad del Equipo -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>Actividad del Equipo</span>
+          <button class="filter-selector" onclick="openAllActivitiesModal()" style="cursor:pointer; border:1px solid var(--primary); color:var(--primary); background:transparent; font-size:11.5px; padding:4px 10px; border-radius:var(--radius-sm); font-weight:700; transition:all 0.2s;">Ver Todo</button>
+        </div>
+        <div class="team-activity-timeline" style="max-height: 320px; overflow-y: auto;">
+          
+          <div class="timeline-item">
+            <div class="timeline-avatar">AM</div>
+            <div class="timeline-body">
+              <div class="timeline-header">
+                <span class="timeline-user">Ana M. (Asesor)</span>
+                <span class="timeline-time">Hace 32 min</span>
+              </div>
+              <p class="timeline-text">Añadió nueva interacción con <strong>Clara Bellocq</strong>: Speech inicial agendado.</p>
+              <div class="d-flex justify-end mt-8">
+                <button class="view-act-btn" onclick="openActivityDetailModal('AM', 'Ana M.', 'Asesor', 'Hace 32 min', 'Añadió nueva interacción con Clara Bellocq: Speech inicial agendado y declaración de salud completada.', 'Interacción Comercial', 'Clara Bellocq')">
+                  <span>Ver actividad</span>
+                  <i class="fa-solid fa-chevron-right fs-9"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-avatar">CA</div>
+            <div class="timeline-body">
+              <div class="timeline-header">
+                <span class="timeline-user">Carlos A. (Asesor)</span>
+                <span class="timeline-time">Hace 2 horas</span>
+              </div>
+              <p class="timeline-text">Cargó propuesta aprobada de <strong>Dr. Claudio Sola</strong> para revisión.</p>
+              <div class="d-flex justify-end mt-8">
+                <button class="view-act-btn" onclick="openActivityDetailModal('CA', 'Carlos A.', 'Asesor', 'Hace 2 horas', 'Cargó propuesta aprobada de Dr. Claudio Sola para revisión y firma de PASS.', 'Carga de Documentos', 'Dr. Claudio Sola')">
+                  <span>Ver actividad</span>
+                  <i class="fa-solid fa-chevron-right fs-9"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-avatar">PA</div>
+            <div class="timeline-body">
+              <div class="timeline-header">
+                <span class="timeline-user">Pedro A. (Asesor)</span>
+                <span class="timeline-time">Hace 4 horas</span>
+              </div>
+              <p class="timeline-text">Creó prospecto nuevo: <strong>Gaston Frías</strong>.</p>
+              <div class="d-flex justify-end mt-8">
+                <button class="view-act-btn" onclick="openActivityDetailModal('PA', 'Pedro A.', 'Asesor', 'Hace 4 horas', 'Creó prospecto nuevo: Gaston Frías (Nicho: Comerciante, Prima proyectada: $1,200/mes).', 'Creación de Prospecto', 'Gaston Frías')">
+                  <span>Ver actividad</span>
+                  <i class="fa-solid fa-chevron-right fs-9"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+
+
+  <script>
+    const defaultMacroProspects = [
+      { id: "1", name: "Dr. Claudio Sola", advisor: "Carlos A.", premium: 2400, status: "emitido", segment: "Médico - Cardiología" },
+      { id: "2", name: "Marta Gómez", advisor: "Carlos A.", premium: 1800, status: "cobrado", segment: "Empresaria - PyMEs" },
+      { id: "3", name: "Ing. Esteban Ruiz", advisor: "Carlos A.", premium: 1500, status: "cantado", segment: "Ingeniero Civil" },
+      { id: "4", name: "Lucía Fernández", advisor: "Carlos A.", premium: 1200, status: "pendiente", segment: "Abogada Penalista" },
+      { id: "5", name: "Dra. Sofía Krieger", advisor: "Carlos A.", premium: 2000, status: "pendiente", segment: "Médico Pediatra" },
+      { id: "6", name: "Pedro Alonso", advisor: "Carlos A.", premium: 1000, status: "descartado", segment: "Comerciante Gastronómico" },
+      
+      { id: "7", name: "Dr. Jorge Medina", advisor: "Ana M.", premium: 3500, status: "emitido", segment: "Médico - Cirugía" },
+      { id: "8", name: "Clara Bellocq", advisor: "Ana M.", premium: 2200, status: "cobrado", segment: "Empresaria" },
+      { id: "9", name: "Estudio Contable S.R.L.", advisor: "Ana M.", premium: 4500, status: "cantado", segment: "Corporativo" },
+      
+      { id: "10", name: "Gaston Frías", advisor: "Pedro A.", premium: 1200, status: "pendiente", segment: "Comerciante" },
+      { id: "11", name: "Dra. Valeria Ramos", advisor: "Pedro A.", premium: 1800, status: "descartado", segment: "Médico - Odontóloga" },
+      { id: "12", name: "Estudio Arquitectura B&A", advisor: "Sofia G.", premium: 3200, status: "cantado", segment: "Corporativo" },
+      { id: "13", name: "Dr. Marcelo Rossi", advisor: "Lucia P.", premium: 5000, status: "emitido", segment: "Médico" }
+    ];
+
+    let storedMacroProspects = localStorage.getItem('bells-macro-prospects');
+    let macroProspects = defaultMacroProspects;
+
+    if (storedMacroProspects) {
+      const parsed = JSON.parse(storedMacroProspects);
+      macroProspects = parsed.map(p => {
+        let mappedStatus = p.status;
+        if (p.status === 'cierre_concretado') mappedStatus = 'cobrado';
+        if (p.status === 'cierre') mappedStatus = 'emitido';
+        if (p.status === 'propuesta_generada' || p.status === 'entrevista_cierre' || p.status === 'reunion_postventa' || p.status === 'reuniones_intermedias') mappedStatus = 'cantado';
+        if (p.status === 'prospecto' || p.status === 'prospecto_activo' || p.status === 'contacto' || p.status === 'abordaje') mappedStatus = 'pendiente';
+        
+        return {
+          id: p.id,
+          name: p.name,
+          advisor: p.advisor,
+          premium: p.premium,
+          status: mappedStatus,
+          segment: p.segment
+        };
+      });
+    }
+
+    // Búsqueda inteligente con IA (Simulador interactivo del Supervisor)
+    function applyAiSuggestion(suggestionText) {
+      const input = document.getElementById('ai-search-input');
+      input.value = suggestionText;
+      input.focus();
+    }
+
+    function closeAiResults() {
+      document.getElementById('ai-results-card').style.display = 'none';
+      document.getElementById('ai-search-input').value = '';
+    }
+
+    function handleAiSearchKeyPress(event) {
+      if (event.key === "Enter") {
+        executeAiSearch();
+      }
+    }
+
+    function executeAiSearch() {
+      const input = document.getElementById('ai-search-input');
+      const query = input.value.trim().toLowerCase();
+      const loader = document.getElementById('ai-search-loader');
+      const resultsCard = document.getElementById('ai-results-card');
+      const resultsList = document.getElementById('ai-results-list');
+      const resultsCount = document.getElementById('ai-results-count');
+      const btn = document.getElementById('ai-search-btn');
+
+      if (!query) {
+        return;
+      }
+
+      loader.style.display = 'flex';
+      resultsCard.style.display = 'none';
+      btn.disabled = true;
+      input.disabled = true;
+
+      setTimeout(() => {
+        loader.style.display = 'none';
+        btn.disabled = false;
+        input.disabled = false;
+
+        let resultsHTML = '';
+        let count = 0;
+
+        if (query.includes('carlos') && (query.includes('contacto') || query.includes('meses') || query.includes('semanas'))) {
+          count = 2;
+          resultsHTML = `
+            <div class="ai-result-item">
+              <div class="ai-result-info">
+                <span class="ai-result-name">Lucía Fernández (Asesor: Carlos A.)</span>
+                <span class="ai-result-detail">Seguro de Vida — Estado: Pendiente. Sin contacto comercial por 14 días.</span>
+              </div>
+              <span class="ai-result-tag red">Llamar</span>
+            </div>
+            <div class="ai-result-item">
+              <div class="ai-result-info">
+                <span class="ai-result-name">Dra. Sofía Krieger (Asesor: Carlos A.)</span>
+                <span class="ai-result-detail">Seguro de Retiro — Estado: Pendiente. Sin contacto por 12 días.</span>
+              </div>
+              <span class="ai-result-tag red">Seguimiento</span>
+            </div>
+          `;
+        } else if (query.includes('ana') && (query.includes('3000') || query.includes('valor') || query.includes('primas'))) {
+          count = 2;
+          resultsHTML = `
+            <div class="ai-result-item">
+              <div class="ai-result-info">
+                <span class="ai-result-name">Dr. Jorge Medina (Asesor: Ana M.)</span>
+                <span class="ai-result-detail">Seguro de Vida Zurich — Prima Anual: $3,500 USD. Emitido correctamente.</span>
+              </div>
+              <span class="ai-result-tag green">Emitido</span>
+            </div>
+            <div class="ai-result-item">
+              <div class="ai-result-info">
+                <span class="ai-result-name">Estudio Contable S.R.L. (Asesor: Ana M.)</span>
+                <span class="ai-result-detail">Seguro Corporativo — Prima Potencial: $4,500 USD. Estado: Prep. previa (Conversación inicial).</span>
+              </div>
+              <span class="ai-result-tag bg-primary-soft c-primary">Propuesta</span>
+            </div>
+          `;
+        } else if (query.includes('pedro') || query.includes('conversión') || query.includes('alerta')) {
+          count = 1;
+          resultsHTML = `
+            <div class="ai-result-item">
+              <div class="ai-result-info">
+                <span class="ai-result-name">Pedro A. (Asesor)</span>
+                <span class="ai-result-detail">Registra conversión del 6.6% en el mes actual. Umbral mínimo requerido: 10%.</span>
+              </div>
+              <span class="ai-result-tag red">Alerta</span>
+            </div>
+          `;
+        } else {
+          // Búsqueda general
+          count = 3;
+          resultsHTML = `
+            <div class="ai-result-item">
+              <div class="ai-result-info">
+                <span class="ai-result-name">Dr. Claudio Sola (Asesor: Carlos A.)</span>
+                <span class="ai-result-detail">Seguro de Retiro Zurich — Prima Anual: $2,400. Estado: Emitido.</span>
+              </div>
+              <span class="ai-result-tag green">Emitido</span>
+            </div>
+            <div class="ai-result-item">
+              <div class="ai-result-info">
+                <span class="ai-result-name">Clara Bellocq (Asesor: Ana M.)</span>
+                <span class="ai-result-detail">Seguro de Vida — Prima Anual: $2,200. Estado: Cobrado.</span>
+              </div>
+              <span class="ai-result-tag green">Cobrado</span>
+            </div>
+            <div class="ai-result-item">
+              <div class="ai-result-info">
+                <span class="ai-result-name">Gaston Frías (Asesor: Pedro A.)</span>
+                <span class="ai-result-detail">Seguro de Retiro — Prima Anual: $1,200. Estado: Pendiente.</span>
+              </div>
+              <span class="ai-result-tag bg-yellow c-yellow">Pendiente</span>
+            </div>
+          `;
+        }
+
+        resultsList.innerHTML = resultsHTML;
+        resultsCount.textContent = count;
+        resultsCard.style.display = 'flex';
+      }, 1200);
+    }
+
+    // Simulador de metas del equipo comercial (Supervisor)
+    function calculateTeamProjections() {
+      const targetMonthlyIncome = parseFloat(document.getElementById('target-monthly-income').value) || 0;
+      const contactsPerWeek = parseInt(document.getElementById('slider-contacts').value);
+      const conversionRatePercent = parseInt(document.getElementById('slider-conversion').value);
+      const avgPremium = parseFloat(document.getElementById('slider-premium-avg').value);
+      const commissionPercent = parseInt(document.getElementById('slider-commission').value);
+
+      // Actualizar etiquetas deslizantes
+      document.getElementById('val-contacts').textContent = contactsPerWeek;
+      document.getElementById('val-conversion').textContent = `${conversionRatePercent}%`;
+      document.getElementById('val-premium-avg').textContent = `$${avgPremium.toLocaleString()}`;
+      document.getElementById('val-commission').textContent = `${commissionPercent}%`;
+
+      // Fórmulas de ventas y primas colectivas (para 3 asesores comercial)
+      const numAdvisors = 3;
+      const annualClosures = (contactsPerWeek * 52) * (conversionRatePercent / 100) * numAdvisors;
+      const annualPremium = annualClosures * avgPremium;
+      const annualCommission = annualPremium * (commissionPercent / 100);
+      const monthlyIncome = annualCommission / 12;
+      const monthlyClosures = annualClosures / 12;
+
+      // Actualizar panel de resultados
+      document.getElementById('res-annual-premium').textContent = `$${Math.round(annualPremium).toLocaleString()}`;
+      document.getElementById('res-monthly-income').textContent = `$${Math.round(monthlyIncome).toLocaleString()}`;
+      document.getElementById('res-sales-needed').textContent = monthlyClosures.toFixed(1);
+
+      // Actualizar el medidor (gauge) visual
+      const targetPercent = targetMonthlyIncome > 0 ? Math.min(Math.round((monthlyIncome / targetMonthlyIncome) * 100), 100) : 0;
+      document.getElementById('gauge-percent').textContent = `${targetPercent}%`;
+      
+      // La longitud de circunferencia del círculo r=60 es 377
+      const strokeOffset = 377 - (377 * targetPercent / 100);
+      document.getElementById('gauge-progress').style.strokeDashoffset = strokeOffset;
+
+      // Estado de la meta
+      const statusBox = document.getElementById('goal-status-box');
+      if (monthlyIncome >= targetMonthlyIncome) {
+        statusBox.textContent = "¡Meta mensual del equipo superada! 🚀";
+        statusBox.style.background = "var(--color-green-bg)";
+        statusBox.style.color = "var(--color-green-text)";
+        statusBox.style.border = "1px solid rgba(16, 185, 129, 0.2)";
+      } else {
+        const diff = targetMonthlyIncome - monthlyIncome;
+        statusBox.textContent = `Faltan $${Math.round(diff).toLocaleString()} para alcanzar el objetivo del equipo`;
+        statusBox.style.background = "var(--color-yellow-bg)";
+        statusBox.style.color = "var(--color-yellow-text)";
+        statusBox.style.border = "1px solid rgba(245, 158, 11, 0.2)";
+      }
+    }
+
+    // Data configurations for the production period chart
+    const chartPeriodData = {
+      quincena: {
+        title: "Producción por Quincena",
+        labels: ["Q1 (Días 1-15)", "Q2 (Días 16-30)"],
+        bars: [
+          { val: "$145k", height: "70%" },
+          { val: "$195k", height: "95%" }
+        ]
+      },
+      semanal: {
+        title: "Producción Semanal",
+        labels: ["Sem 1", "Sem 2", "Sem 3", "Sem 4"],
+        bars: [
+          { val: "$15k", height: "30%" },
+          { val: "$28k", height: "55%" },
+          { val: "$42k", height: "85%" },
+          { val: "$32k", height: "65%" }
+        ]
+      },
+      mensual: {
+        title: "Producción Mensual",
+        labels: ["Mayo", "Junio", "Julio", "Agosto"],
+        bars: [
+          { val: "$75k", height: "50%" },
+          { val: "$95k", height: "65%" },
+          { val: "$110k", height: "75%" },
+          { val: "$130k", height: "90%" }
+        ]
+      },
+      trimestre: {
+        title: "Producción Mensual (Trimestre)",
+        labels: ["Julio", "Agosto", "Septiembre"],
+        bars: [
+          { val: "$110k", height: "65%" },
+          { val: "$130k", height: "78%" },
+          { val: "$100k", height: "60%" }
+        ]
+      },
+      anio: {
+        title: "Producción Trimestral (Año)",
+        labels: ["Trim 1", "Trim 2", "Trim 3", "Trim 4 (Proy.)"],
+        bars: [
+          { val: "$280k", height: "75%" },
+          { val: "$310k", height: "82%" },
+          { val: "$340k", height: "90%" },
+          { val: "$410k", height: "98%" }
+        ]
+      }
+    };
+
+    function toggleChartPeriod(period) {
+      const config = chartPeriodData[period];
+      if (!config) return;
+
+      // Update title
+      document.getElementById('prod-chart-title').textContent = config.title;
+
+      // Render bars
+      const wrapper = document.getElementById('bars-wrapper');
+      wrapper.innerHTML = '';
+      config.bars.forEach(bar => {
+        const div = document.createElement('div');
+        div.className = 'chart-bar-col';
+        div.style.height = bar.height;
+        div.setAttribute('data-val', bar.val);
+        wrapper.appendChild(div);
+      });
+
+      // Render labels
+      const labelsContainer = document.getElementById('bars-labels');
+      labelsContainer.innerHTML = '';
+      config.labels.forEach(label => {
+        const span = document.createElement('span');
+        span.textContent = label;
+        labelsContainer.appendChild(span);
+      });
+    }
+
+    const advisorPerformanceData = {
+      dia: [
+        { avatar: 'CA', name: 'Carlos A.', contacts: '1 / 2', closures: 0, conversion: '0.0%', conversionColor: 'var(--color-red-text)', progress: 0 },
+        { avatar: 'AM', name: 'Ana M.', avatarColor: 'var(--color-green-text)', avatarBg: 'var(--color-green-bg)', contacts: '3 / 3', closures: 1, conversion: '33.3%', conversionColor: 'var(--primary)', progress: 5 },
+        { avatar: 'PA', name: 'Pedro A.', avatarColor: 'var(--color-yellow-text)', avatarBg: 'var(--color-yellow-bg)', contacts: '0 / 1', closures: 0, conversion: '0.0%', conversionColor: 'var(--color-red-text)', progress: 0 }
+      ],
+      semana: [
+        { avatar: 'CA', name: 'Carlos A.', contacts: '6 / 10', closures: 1, conversion: '10.0%', conversionColor: 'var(--primary)', progress: 15 },
+        { avatar: 'AM', name: 'Ana M.', avatarColor: 'var(--color-green-text)', avatarBg: 'var(--color-green-bg)', contacts: '9 / 12', closures: 2, conversion: '16.6%', conversionColor: 'var(--primary)', progress: 20 },
+        { avatar: 'PA', name: 'Pedro A.', avatarColor: 'var(--color-yellow-text)', avatarBg: 'var(--color-yellow-bg)', contacts: '3 / 6', closures: 0, conversion: '0.0%', conversionColor: 'var(--color-red-text)', progress: 5 }
+      ],
+      quincena: [
+        { avatar: 'CA', name: 'Carlos A.', contacts: '15 / 22', closures: 2, conversion: '9.0%', conversionColor: 'var(--color-red-text)', progress: 40 },
+        { avatar: 'AM', name: 'Ana M.', avatarColor: 'var(--color-green-text)', avatarBg: 'var(--color-green-bg)', contacts: '20 / 26', closures: 3, conversion: '11.5%', conversionColor: 'var(--primary)', progress: 50 },
+        { avatar: 'PA', name: 'Pedro A.', avatarColor: 'var(--color-yellow-text)', avatarBg: 'var(--color-yellow-bg)', contacts: '8 / 15', closures: 0, conversion: '0.0%', conversionColor: 'var(--color-red-text)', progress: 20 }
+      ],
+      mes: [
+        { avatar: 'CA', name: 'Carlos A.', contacts: '28 / 40', closures: 3, conversion: '15.4%', conversionColor: 'var(--primary)', progress: 80 },
+        { avatar: 'AM', name: 'Ana M.', avatarColor: 'var(--color-green-text)', avatarBg: 'var(--color-green-bg)', contacts: '42 / 50', closures: 6, conversion: '18.2%', conversionColor: 'var(--primary)', progress: 95 },
+        { avatar: 'PA', name: 'Pedro A.', avatarColor: 'var(--color-yellow-text)', avatarBg: 'var(--color-yellow-bg)', contacts: '15 / 30', closures: 1, conversion: '6.6%', conversionColor: 'var(--color-red-text)', progress: 45 }
+      ],
+      trimestral: [
+        { avatar: 'CA', name: 'Carlos A.', contacts: '74 / 110', closures: 12, conversion: '10.9%', conversionColor: 'var(--primary)', progress: 75 },
+        { avatar: 'AM', name: 'Ana M.', avatarColor: 'var(--color-green-text)', avatarBg: 'var(--color-green-bg)', contacts: '95 / 130', closures: 19, conversion: '14.6%', conversionColor: 'var(--primary)', progress: 88 },
+        { avatar: 'PA', name: 'Pedro A.', avatarColor: 'var(--color-yellow-text)', avatarBg: 'var(--color-yellow-bg)', contacts: '40 / 80', closures: 4, conversion: '5.0%', conversionColor: 'var(--color-red-text)', progress: 38 }
+      ],
+      anual: [
+        { avatar: 'CA', name: 'Carlos A.', contacts: '290 / 420', closures: 48, conversion: '11.4%', conversionColor: 'var(--primary)', progress: 90 },
+        { avatar: 'AM', name: 'Ana M.', avatarColor: 'var(--color-green-text)', avatarBg: 'var(--color-green-bg)', contacts: '360 / 490', closures: 68, conversion: '13.8%', conversionColor: 'var(--primary)', progress: 96 },
+        { avatar: 'PA', name: 'Pedro A.', avatarColor: 'var(--color-yellow-text)', avatarBg: 'var(--color-yellow-bg)', contacts: '150 / 310', closures: 15, conversion: '4.8%', conversionColor: 'var(--color-red-text)', progress: 62 }
+      ]
+    };
+
+    function renderAdvisorPerformance(period) {
+      const data = advisorPerformanceData[period];
+      if (!data) return;
+      const tbody = document.getElementById('advisor-table-body');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        const avatarStyle = row.avatarColor ? `color:${row.avatarColor}; background:${row.avatarBg};` : '';
+        tr.innerHTML = `
+          <td>
+            <div class="advisor-profile">
+              <div class="adv-avatar" style="${avatarStyle}">${row.avatar}</div>
+              <strong>${row.name}</strong>
+            </div>
+          </td>
+          <td>${row.contacts}</td>
+          <td>${row.closures}</td>
+          <td style="font-weight: 700; color: ${row.conversionColor};">${row.conversion}</td>
+          <td>
+            <div class="progress-bar-sm"><div class="progress-fill" style="width: ${row.progress}%;"></div></div>
+            <strong>${row.progress}%</strong>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Utility to adjust hex color brightness
+    function adjustColorBrightness(hex, percent) {
+      let R = parseInt(hex.substring(1, 3), 16);
+      let G = parseInt(hex.substring(3, 5), 16);
+      let B = parseInt(hex.substring(5, 7), 16);
+
+      R = parseInt(R * (100 + percent) / 100);
+      G = parseInt(G * (100 + percent) / 100);
+      B = parseInt(B * (100 + percent) / 100);
+
+      R = (R < 255) ? R : 255;
+      G = (G < 255) ? G : 255;
+      B = (B < 255) ? B : 255;
+
+      R = (R > 0) ? R : 0;
+      G = (G > 0) ? G : 0;
+      B = (B > 0) ? B : 0;
+
+      const rHex = R.toString(16).padStart(2, '0');
+      const gHex = G.toString(16).padStart(2, '0');
+      const bHex = B.toString(16).padStart(2, '0');
+
+      return `#${rHex}${gHex}${bHex}`;
+    }
+
+    // Convert Hex to RGBA
+    function adjustColorOpacity(hex, opacity) {
+      let R = parseInt(hex.substring(1, 3), 16);
+      let G = parseInt(hex.substring(3, 5), 16);
+      let B = parseInt(hex.substring(5, 7), 16);
+      return `rgba(${R}, ${G}, ${B}, ${opacity})`;
+    }
+
+    // Theme controls
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+        const themeDark = document.getElementById('theme-dark');
+        const themeLight = document.getElementById('theme-light');
+        if (themeDark) themeDark.classList.add('active');
+        if (themeLight) themeLight.classList.remove('active');
+        localStorage.setItem('bells-theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-theme');
+        const themeLight = document.getElementById('theme-light');
+        const themeDark = document.getElementById('theme-dark');
+        if (themeLight) themeLight.classList.add('active');
+        if (themeDark) themeDark.classList.remove('active');
+        localStorage.setItem('bells-theme', 'light');
+      }
+    }
+
+    // Primary color controls
+    function applyPrimaryColor(color) {
+      if (!color) return;
+      document.documentElement.style.setProperty('--primary', color);
+      
+      const hoverColor = adjustColorBrightness(color, -15);
+      document.documentElement.style.setProperty('--primary-hover', hoverColor);
+      
+      const lightColor = adjustColorOpacity(color, 0.08);
+      document.documentElement.style.setProperty('--primary-light', lightColor);
+
+      const picker = document.getElementById('primary-color-picker');
+      if (picker) picker.value = color;
+    }
+
+    function setPrimaryColor(color) {
+      localStorage.setItem('bells-primary-color', color);
+      applyPrimaryColor(color);
+    }
+
+    function renderColorPresets() {
+      const presetsContainer = document.getElementById('color-presets');
+      if (!presetsContainer) return;
+      presetsContainer.innerHTML = '';
+      
+      const presets = ['#7c3aed', '#3b82f6', '#10b981', '#ef4444', '#f59e0b'];
+
+      presets.forEach(color => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.width = '28px';
+        btn.style.height = '28px';
+        btn.style.borderRadius = '50%';
+        btn.style.backgroundColor = color;
+        btn.style.border = '2px solid var(--border-color)';
+        btn.style.cursor = 'pointer';
+        btn.style.transition = 'transform 0.1s';
+        btn.title = color;
+        btn.onclick = () => setPrimaryColor(color);
+        btn.onmouseover = () => btn.style.transform = 'scale(1.15)';
+        btn.onmouseout = () => btn.style.transform = 'scale(1)';
+        presetsContainer.appendChild(btn);
+      });
+    }
+
+    // Logo load & handlers
+    function handleLogoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+        localStorage.setItem('bells-custom-logo', base64Data);
+        loadCustomLogo();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeLogo() {
+      localStorage.removeItem('bells-custom-logo');
+      loadCustomLogo();
+    }
+
+    function loadCustomLogo() {
+      const logo = localStorage.getItem('bells-custom-logo');
+      const brandIcon = document.querySelector('.brand-section .brand-icon');
+      if (brandIcon) {
+        if (logo) {
+          brandIcon.innerHTML = `<img src="${logo}" class="radius-md h-100 w-100 object-contain" />`;
+        } else {
+          brandIcon.innerHTML = `<i class="fa-solid fa-bell"></i>`;
+        }
+      }
+    }
+
+    // Get Nichos data
+    function getNichos() {
+      const stored = localStorage.getItem('bells-nichos');
+      if (stored) return JSON.parse(stored);
+      const defaults = [
+        { name: "Médicos", percentage: 55, color: "#7c3aed" },
+        { name: "Empresas", percentage: 25, color: "#3b82f6" },
+        { name: "Legal", percentage: 20, color: "#f59e0b" }
+      ];
+      localStorage.setItem('bells-nichos', JSON.stringify(defaults));
+      return defaults;
+    }
+
+    function renderDonutChart() {
+      const nichos = getNichos();
+      const donut = document.querySelector('.donut-chart');
+      const legends = document.querySelector('.donut-legends');
+      if (!donut || !legends) return;
+
+      legends.innerHTML = '';
+      let gradientParts = [];
+      let currentPct = 0;
+
+      const total = nichos.reduce((sum, n) => sum + (parseFloat(n.percentage) || 0), 0) || 1;
+
+      nichos.forEach(n => {
+        const rawPct = parseFloat(n.percentage) || 0;
+        const normPct = Math.round((rawPct / total) * 100);
+        
+        const nextPct = currentPct + normPct;
+        gradientParts.push(`${n.color} ${currentPct}% ${nextPct}%`);
+        currentPct = nextPct;
+
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        item.innerHTML = `<span class="legend-dot" style="background:${n.color};"></span><span>${n.name} (${normPct}%)</span>`;
+        legends.appendChild(item);
+      });
+
+      donut.style.background = `conic-gradient(${gradientParts.join(', ')})`;
+    }
+
+    function getCampaigns() {
+      const stored = localStorage.getItem('bells-campaigns');
+      if (stored) return JSON.parse(stored);
+      const defaults = [
+        {
+          id: 'zurich-vida',
+          name: 'Campaña Zurich Vida',
+          reward: 'Viaje Todo Pago a Suiza',
+          type: 'zurich',
+          goal: 50,
+          current: 38,
+          rewardIcon: 'fa-plane',
+          rewardIconName: 'Viaje'
+        },
+        {
+          id: 'bells-auto',
+          name: 'Incentivo Interno Auto',
+          reward: 'Bono Trimestral Especial',
+          type: 'interna',
+          goal: 100000,
+          current: 68000,
+          rewardIcon: 'fa-coins',
+          rewardIconName: 'Bono $5k'
+        },
+        {
+          id: 'salud-pro',
+          name: 'Campaña Salud Pro',
+          reward: 'Macbook Pro M3 Max',
+          type: 'interna',
+          goal: 20,
+          current: 14,
+          rewardIcon: 'fa-laptop',
+          rewardIconName: 'Macbook'
+        }
+      ];
+      localStorage.setItem('bells-campaigns', JSON.stringify(defaults));
+      return defaults;
+    }
+
+    function updateDashboardCampaigns() {
+      const campaigns = getCampaigns();
+      const select = document.getElementById('campaign-select');
+      if (!select) return;
+      
+      const currentVal = select.value;
+      select.innerHTML = '';
+      
+      campaigns.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        const typeLabel = c.type === 'zurich' ? 'Zurich' : 'Interno';
+        opt.textContent = `${c.name} (${typeLabel})`;
+        select.appendChild(opt);
+      });
+
+      if (campaigns.some(c => c.id === currentVal)) {
+        select.value = currentVal;
+      } else if (campaigns.length > 0) {
+        select.value = campaigns[0].id;
+      }
+
+      syncCampaignDisplay();
+    }
+
+    function syncCampaignDisplay() {
+      const select = document.getElementById('campaign-select');
+      if (!select) return;
+      const id = select.value;
+      const campaigns = getCampaigns();
+      const camp = campaigns.find(c => c.id === id);
+      if (!camp) return;
+
+      document.getElementById('camp-reward-name').textContent = camp.reward;
+      document.getElementById('camp-reward-badge').innerHTML = `<i class="fa-solid ${camp.rewardIcon}"></i> ${camp.rewardIconName}`;
+      
+      const formattedProgress = camp.type === 'zurich' 
+        ? `${camp.current} / ${camp.goal} Pólizas`
+        : `$${camp.current.toLocaleString()} / $${camp.goal.toLocaleString()} Prima`;
+      
+      document.getElementById('camp-progress-text').textContent = formattedProgress;
+      
+      const pct = Math.min(100, Math.round((camp.current / camp.goal) * 100));
+      document.getElementById('camp-progress-fill').style.width = pct + '%';
+
+      const contribContainer = document.getElementById('camp-contributors');
+      contribContainer.innerHTML = '';
+      
+      const contribs = [
+        { name: 'Ana M.', pct: 50 },
+        { name: 'Carlos A.', pct: 37 },
+        { name: 'Pedro A.', pct: 13 }
+      ];
+
+      contribs.forEach(c => {
+        const contributionVal = camp.type === 'zurich'
+          ? `${Math.round(camp.current * c.pct / 100)} pólizas`
+          : `$${Math.round(camp.current * c.pct / 100).toLocaleString()} prima`;
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.marginBottom = '4px';
+        row.innerHTML = `
+          <span class="c-primary-fg fw-600">${c.name}</span>
+          <span style="color:var(--text-secondary); font-weight:500;">${contributionVal} (${c.pct}%)</span>
+        `;
+        contribContainer.appendChild(row);
+      });
+
+      // Recalcular alineación tras actualizar campaña
+      setTimeout(alignRightSidebarHeight, 50);
+    }
+
+    function toggleCampaign(id) {
+      syncCampaignDisplay();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Initialize general settings
+      const savedTheme = localStorage.getItem('bells-theme') || 'light';
+      setTheme(savedTheme);
+      
+      const savedColor = localStorage.getItem('bells-primary-color');
+      if (savedColor) applyPrimaryColor(savedColor);
+
+      loadCustomLogo();
+      renderColorPresets();
+
+      // Render Dashboard & CRUDs
+      renderAdvisorPerformance("mes");
+      updateDashboardCampaigns();
+      renderDonutChart();
+
+      // Inicializar simulador de metas de equipo
+      calculateTeamProjections();
+
+      // Ajustar altura de la barra lateral al cargar
+      setTimeout(alignRightSidebarHeight, 150);
+    });
+
+    function alignRightSidebarHeight() {
+      const colLeft = document.querySelector('.col-left');
+      const colRight = document.querySelector('.col-right');
+      const timeline = document.querySelector('.team-activity-timeline');
+      if (!colLeft || !colRight || !timeline) return;
+
+      // Reseteo para cálculo limpio
+      timeline.style.height = 'auto';
+      timeline.style.maxHeight = 'none';
+
+      // Altura del contenedor izquierdo
+      const colLeftHeight = colLeft.offsetHeight;
+      const colRightHeight = colRight.offsetHeight;
+
+      // Calculamos la diferencia y se la asignamos al timeline
+      const currentTimelineHeight = timeline.offsetHeight;
+      const targetTimelineHeight = currentTimelineHeight + (colLeftHeight - colRightHeight);
+
+      if (targetTimelineHeight > 100) {
+        timeline.style.height = `${targetTimelineHeight}px`;
+        timeline.style.maxHeight = `${targetTimelineHeight}px`;
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      alignRightSidebarHeight();
+    });
+
+    const allActivities = [
+      { avatar: 'AM', name: 'Ana M.', role: 'Asesor', time: 'Hace 32 min', desc: 'Añadió nueva interacción con Clara Bellocq: Speech inicial agendado y declaración de salud completada.', type: 'Interacción Comercial', client: 'Clara Bellocq' },
+      { avatar: 'CA', name: 'Carlos A.', role: 'Asesor', time: 'Hace 2 horas', desc: 'Cargó propuesta aprobada de Dr. Claudio Sola para revisión y firma de PASS.', type: 'Carga de Documentos', client: 'Dr. Claudio Sola' },
+      { avatar: 'PA', name: 'Pedro A.', role: 'Asesor', time: 'Hace 4 horas', desc: 'Creó prospecto nuevo: Gaston Frías (Nicho: Comerciante, Prima proyectada: $1,200/mes).', type: 'Creación de Prospecto', client: 'Gaston Frías' },
+      { avatar: 'AM', name: 'Ana M.', role: 'Asesor', time: 'Hace 1 día', desc: 'Marcó propuesta de Clara Bellocq como Cobrada (Prima: $2,200).', type: 'Pago Recibido', client: 'Clara Bellocq' },
+      { avatar: 'CA', name: 'Carlos A.', role: 'Asesor', time: 'Hace 1 día', desc: 'Agendó llamada de seguimiento con Ing. Esteban Ruiz (CUIT pendiente).', type: 'Agenda', client: 'Ing. Esteban Ruiz' },
+      { avatar: 'PA', name: 'Pedro A.', role: 'Asesor', time: 'Hace 2 días', desc: 'Descartó prospecto Dra. Valeria Ramos (Odontóloga) por falta de interés en cobertura extendida.', type: 'Lead Descartado', client: 'Dra. Valeria Ramos' },
+      { avatar: 'J', name: 'Juan', role: 'Team Leader', time: 'Hace 2 días', desc: 'Firmó y Emitió póliza de Dr. Jorge Medina en Zurich (Prima: $3,500).', type: 'Emisión Póliza', client: 'Dr. Jorge Medina' },
+      { avatar: 'AM', name: 'Ana M.', role: 'Asesor', time: 'Hace 3 días', desc: 'Registró primer contacto con Estudio Contable S.R.L. (Prima potencial: $4,500).', type: 'Primer Contacto', client: 'Estudio Contable S.R.L.' },
+      { avatar: 'CA', name: 'Carlos A.', role: 'Asesor', time: 'Hace 4 días', desc: 'Marcó póliza de Marta Gómez como Cobrada en Zurich (Prima: $1,800).', type: 'Pago Recibido', client: 'Marta Gómez' },
+      { avatar: 'CA', name: 'Carlos A.', role: 'Asesor', time: 'Hace 5 días', desc: 'Envió propuesta de Zurich Auto a Ing. Esteban Ruiz (Prima estimada: $1,500).', type: 'Envío Propuesta', client: 'Ing. Esteban Ruiz' },
+      { avatar: 'J', name: 'Juan', role: 'Team Leader', time: 'Hace 5 días', desc: 'Verificó y aprobó constancia de CUIT presentada por Marta Gómez.', type: 'Verificación CUIT', client: 'Marta Gómez' },
+      { avatar: 'AM', name: 'Ana M.', role: 'Asesor', time: 'Hace 6 días', desc: 'Agendó examen médico requerido para el Dr. Jorge Medina (Campaña Zurich Vida).', type: 'Examen Médico', client: 'Dr. Jorge Medina' },
+      { avatar: 'PA', name: 'Pedro A.', role: 'Asesor', time: 'Hace 6 días', desc: 'Registró llamada de prospección en frío con la administración de Clínica del Sol.', type: 'Llamada Fría', client: 'Clínica del Sol' },
+      { avatar: 'CA', name: 'Carlos A.', role: 'Asesor', time: 'Hace 1 semana', desc: 'Re-negoció las primas de la póliza de Dr. Claudio Sola incrementando cobertura en un 20%.', type: 'Aumento Cobertura', client: 'Dr. Claudio Sola' },
+      { avatar: 'AM', name: 'Ana M.', role: 'Asesor', time: 'Hace 1 semana', desc: 'Cargó DNI firmado y Declaración Jurada de Salud para Estudio Contable S.R.L.', type: 'Carga Documentos', client: 'Estudio Contable S.R.L.' },
+      { avatar: 'J', name: 'Juan', role: 'Team Leader', time: 'Hace 1 semana', desc: 'Emitió póliza Zurich de responsabilidad civil para Estudio Jurídico Asociados.', type: 'Emisión Póliza', client: 'Estudio Jurídico Asociados' },
+      { avatar: 'PA', name: 'Pedro A.', role: 'Asesor', time: 'Hace 1 semana', desc: 'Completó la capacitación de inducción de BellsGroup sobre pólizas de Vida Zurich.', type: 'Capacitación', client: 'Pedro A.' }
+    ];
+
+    function openAllActivitiesModal() {
+      const container = document.getElementById('all-activities-list-container');
+      container.innerHTML = '';
+      allActivities.forEach(act => {
+        const item = document.createElement('div');
+        item.style.display = 'flex';
+        item.style.gap = '12px';
+        item.style.borderBottom = '1px solid var(--border-color)';
+        item.style.paddingBottom = '10px';
+        item.style.marginTop = '10px';
+        item.innerHTML = `
+          <div class="timeline-avatar">${act.avatar}</div>
+          <div class="flex-1">
+            <div style="display:flex; justify-content:space-between; font-size:12.5px;">
+              <strong>${act.name} (${act.role})</strong>
+              <span class="c-muted fs-11">${act.time}</span>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">${act.desc}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+              <span style="font-size:10px; font-weight:700; background:var(--primary-light); color:var(--primary); padding:2px 6px; border-radius:var(--radius-sm);">${act.type}</span>
+              <button class="view-act-btn" onclick="document.getElementById('all-activities-modal').close(); openActivityDetailModal('${act.avatar}', '${act.name}', '${act.role}', '${act.time}', '${act.desc.replace(/'/g, '\\\'')}', '${act.type}', '${act.client.replace(/'/g, '\\\'')}')">
+                <span>Ver detalle</span>
+                <i class="fa-solid fa-chevron-right fs-9"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+      document.getElementById('all-activities-modal').showModal();
+    }
+
+    function openActivityDetailModal(avatar, name, role, time, desc, type, client) {
+      document.getElementById('act-modal-avatar').textContent = avatar;
+      document.getElementById('act-modal-user').textContent = name;
+      document.getElementById('act-modal-role').textContent = role;
+      document.getElementById('act-modal-time').textContent = time;
+      document.getElementById('act-modal-desc').textContent = desc;
+      document.getElementById('act-modal-type').textContent = type;
+      document.getElementById('act-modal-client').textContent = client;
+      
+      document.getElementById('activity-detail-modal').showModal();
+    }
+
+
+  </script>
+
+  <!-- HTML5 Dialog Modals -->
+  <dialog id="all-activities-modal" onclick="event.target === this && this.close()">
+    <div class="modal-header">
+      <h3 class="modal-title">Registro Histórico de Actividades</h3>
+      <button class="modal-close" onclick="document.getElementById('all-activities-modal').close()">&times;</button>
+    </div>
+    <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+      <div class="d-flex-col gap-12" id="all-activities-list-container">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="document.getElementById('all-activities-modal').close()">Cerrar</button>
+    </div>
+  </dialog>
+
+  <dialog id="activity-detail-modal" onclick="event.target === this && this.close()">
+    <div class="modal-header">
+      <h3 class="modal-title">Detalle de Actividad</h3>
+      <button class="modal-close" onclick="document.getElementById('activity-detail-modal').close()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="d-flex items-center gap-12">
+        <div class="adv-avatar" id="act-modal-avatar" style="width:40px; height:40px; font-size:14px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--primary-light); color:var(--primary); font-weight:700;">AM</div>
+        <div>
+          <strong id="act-modal-user" style="font-size:14.5px;">Ana M.</strong>
+          <div id="act-modal-role" style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Asesor</div>
+        </div>
+      </div>
+      <div class="mt-12">
+        <div class="c-muted fs-11 fw-700 mb-4 text-uppercase">Tipo de Evento</div>
+        <div id="act-modal-type" style="font-weight:600; color:var(--primary);">Interacción Comercial</div>
+      </div>
+      <div>
+        <div class="c-muted fs-11 fw-700 mb-4 text-uppercase">Cliente Asociado</div>
+        <div id="act-modal-client" class="fw-600">Clara Bellocq</div>
+      </div>
+      <div>
+        <div class="c-muted fs-11 fw-700 mb-4 text-uppercase">Descripción Detallada</div>
+        <div id="act-modal-desc" style="background:var(--bg-muted); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-color); color:var(--text-secondary);">Detalle</div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted); margin-top:8px;">
+        <span>Estado: Auditado</span>
+        <span id="act-modal-time">Hace 32 min</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="document.getElementById('activity-detail-modal').close()">Entendido</button>
+    </div>
+  </dialog>
+
+
+
+</body>
+</html>

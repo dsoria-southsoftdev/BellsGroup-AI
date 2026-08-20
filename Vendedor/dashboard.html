@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BellsGroup CRM - Dashboard Comercial</title>
+  <meta name="description" content="Dashboard comercial de BellsGroup. Gestión de KPIs, metas, proyecciones financieras y sincronización con Zurich.">
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Design System Compartido (Tokens + Base + Componentes) -->
+  <link rel="stylesheet" href="../bells.css">
+  
+  <!-- Google Fonts: Roboto & Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <style>
+    /* Material Design 3 Redesign Overrides for Vendedor Dashboard */
+    :root {
+      --primary: #6E3AFF;
+      --primary-light: #EDE7FF;
+      --primary-dark: #22005D;
+      
+      --md-sys-color-primary: #6E3AFF;
+      --md-sys-color-primary-container: #EDE7FF;
+      --md-sys-color-on-primary-container: #22005D;
+      --md-sys-color-surface: #FFFFFF;
+      --md-sys-color-surface-variant: #F3F4F8;
+      --md-sys-color-background: #F8F9FE;
+      --md-sys-color-on-surface: #1B1B1F;
+      --md-sys-color-outline: #E0E2EC;
+      
+      --color-warning-bg: #FFF8E1;
+      --color-warning-text: #8C6B00;
+      --color-success: #10B981;
+      
+      --radius-s: 8px;
+      --radius-m: 16px;
+      --radius-l: 24px;
+      
+      --shadow-1: 0px 2px 6px rgba(0, 0, 0, 0.04);
+      --shadow-2: 0px 4px 16px rgba(110, 58, 255, 0.08);
+      
+      --font-family: 'Inter', sans-serif;
+      --bg-main: var(--md-sys-color-background);
+      --bg-card: var(--md-sys-color-surface);
+      --border-color: var(--md-sys-color-outline);
+    }
+
+    body {
+      font-family: var(--font-family) !important;
+      background-color: var(--bg-main) !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+
+    /* Sidebar Redesign (Material 3 Navigation Drawer Style) */
+    .sidebar-left {
+      width: 260px !important;
+      background-color: var(--md-sys-color-surface) !important;
+      border-right: 1px solid var(--md-sys-color-outline) !important;
+      padding: 24px 16px !important;
+      gap: 24px !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    
+    .sidebar-branding {
+      border-bottom: none !important;
+      padding: 0 12px 0px !important;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-branding .brand-icon {
+      width: 36px !important;
+      height: 36px !important;
+      background: var(--md-sys-color-primary) !important;
+      color: white !important;
+      border-radius: 10px !important;
+      display: grid !important;
+      place-items: center !important;
+      box-shadow: none !important;
+    }
+    
+    .sidebar-branding .brand-name {
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      font-size: 1.25rem !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.5px !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+
+    .sidebar-nav {
+      gap: 4px !important;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-nav .nav-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #767680;
+      text-transform: uppercase;
+      padding: 8px 12px 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-nav .nav-item {
+      border-radius: 100px !important; /* MD3 Pill shape */
+      padding: 12px 16px !important;
+      color: #44474E !important;
+      font-size: 0.9rem !important;
+      font-weight: 500 !important;
+      transition: all 0.2s ease !important;
+      background: transparent !important;
+      justify-content: flex-start !important;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .sidebar-nav .nav-item:hover {
+      background-color: var(--md-sys-color-surface-variant) !important;
+      transform: none !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+
+    .sidebar-nav .nav-item.active {
+      background-color: var(--md-sys-color-primary-container) !important;
+      color: var(--md-sys-color-on-primary-container) !important;
+      font-weight: 700 !important;
+    }
+
+    .sidebar-nav .nav-item .material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    /* Meta / Incentivos bottom card */
+    .campaign-card {
+      margin-top: auto;
+      background: linear-gradient(135deg, #F3ECFF 0%, #E8DDFF 100%);
+      padding: 16px;
+      border-radius: var(--radius-m);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .campaign-card .progress-bar {
+      height: 6px;
+      background-color: rgba(110, 58, 255, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .campaign-card .progress-fill {
+      height: 100%;
+      background-color: var(--md-sys-color-primary);
+      border-radius: 10px;
+    }
+
+    /* Top Bar Redesign */
+    .top-header {
+      height: 64px !important;
+      background-color: var(--md-sys-color-surface) !important;
+      border-bottom: 1px solid var(--md-sys-color-outline) !important;
+      padding: 0 32px !important;
+      box-shadow: none !important;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .top-header .user-profile {
+      gap: 12px !important;
+      display: flex;
+      align-items: center;
+    }
+
+    .top-header .user-avatar {
+      width: 36px !important;
+      height: 36px !important;
+      background-color: var(--md-sys-color-primary-container) !important;
+      color: var(--md-sys-color-primary) !important;
+      border-radius: 50% !important;
+      display: grid !important;
+      place-items: center !important;
+      font-weight: 700 !important;
+      font-size: 14px !important;
+    }
+    
+    .top-header .user-info .user-name {
+      font-size: 0.85rem !important;
+      font-weight: 700 !important;
+      color: var(--md-sys-color-on-surface) !important;
+    }
+    
+    .top-header .user-info .user-role {
+      font-size: 0.75rem !important;
+      color: #5F6368 !important;
+    }
+
+    /* Content Area Layout */
+    .dashboard-body {
+      padding: 24px 32px !important;
+      gap: 20px !important;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Alert Banner (Redesign of performance alert) */
+    .alerts-card {
+      background-color: var(--color-warning-bg) !important;
+      border: 1px solid #FFE082 !important;
+      border-radius: var(--radius-m) !important;
+      padding: 12px 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      color: var(--color-warning-text) !important;
+      font-size: 0.9rem !important;
+      box-shadow: none !important;
+      margin-bottom: 0 !important;
+    }
+    
+    .alerts-card i {
+      font-size: 20px !important;
+      color: var(--color-warning-text) !important;
+    }
+    
+    .alerts-card .alerts-content h5 {
+      display: inline !important;
+      font-weight: 700 !important;
+      margin: 0 !important;
+      font-size: 0.9rem !important;
+    }
+    
+    .alerts-card .alerts-content p {
+      display: inline !important;
+      margin: 0 !important;
+      color: var(--color-warning-text) !important;
+      font-size: 0.9rem !important;
+    }
+
+    /* Smart AI Search Bar */
+    .ai-search-panel {
+      background: var(--md-sys-color-surface) !important;
+      border-radius: var(--radius-m) !important;
+      padding: 16px !important;
+      box-shadow: var(--shadow-1) !important;
+      border: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 12px !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    .ai-input-group {
+      display: flex !important;
+      align-items: center !important;
+      background-color: var(--md-sys-color-surface-variant) !important;
+      border-radius: 100px !important;
+      padding: 6px 6px 6px 16px !important;
+      gap: 8px !important;
+      width: 100% !important;
+    }
+
+    .ai-input-group span.material-symbols-outlined {
+      color: var(--md-sys-color-primary) !important;
+    }
+
+    .ai-input-group input {
+      border: none !important;
+      background: transparent !important;
+      outline: none !important;
+      flex: 1 !important;
+      font-size: 0.95rem !important;
+      color: var(--md-sys-color-on-surface) !important;
+      padding: 8px 0 !important;
+    }
+
+    .ai-search-panel .btn-ai-search {
+      background-color: var(--md-sys-color-primary) !important;
+      color: white !important;
+      border: none !important;
+      padding: 8px 20px !important;
+      border-radius: 100px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      transition: background 0.2s !important;
+      box-shadow: none !important;
+      font-size: 0.9rem !important;
+    }
+
+    .ai-search-panel .btn-ai-search:hover {
+      background-color: #5829E0 !important;
+    }
+
+    .ai-search-clear {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-muted) !important;
+      cursor: pointer !important;
+      padding: 4px !important;
+      border-radius: 50% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex-shrink: 0 !important;
+      font-size: 13px !important;
+    }
+
+    .ai-search-clear:hover {
+      color: var(--text-primary) !important;
+      background: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .ai-search-panel .chips-container {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .ai-search-panel .chip-label {
+      font-size: 0.75rem;
+      color: #606368;
+      font-weight: 500;
+    }
+
+    .ai-search-panel .chip {
+      background-color: var(--md-sys-color-surface-variant);
+      border: 1px solid var(--md-sys-color-outline);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .ai-search-panel .chip:hover {
+      background-color: var(--md-sys-color-primary-container);
+      border-color: var(--md-sys-color-primary);
+    }
+
+    /* KPIs Grid */
+    .scorecard-grid {
+      display: grid !important;
+      grid-template-columns: repeat(6, 1fr) !important;
+      gap: 12px !important;
+      width: 100% !important;
+    }
+
+    .scorecard-grid .kpi-card {
+      background: var(--md-sys-color-surface) !important;
+      padding: 14px !important;
+      min-width: 0 !important;
+      border-radius: var(--radius-m) !important;
+      box-shadow: var(--shadow-1) !important;
+      border: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+
+    .scorecard-grid .kpi-card:hover {
+      transform: translateY(-4px) !important;
+      box-shadow: var(--shadow-2) !important;
+    }
+    
+    .scorecard-grid .kpi-card::after {
+      display: none !important; /* Hide old top border line */
+    }
+
+    .scorecard-grid .kpi-card .kpi-header {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      color: #5F6368 !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      margin-bottom: 0 !important;
+    }
+
+    .scorecard-grid .kpi-card .kpi-value {
+      font-size: 1.3rem !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.5px !important;
+      color: var(--md-sys-color-on-surface) !important;
+      white-space: nowrap !important;
+    }
+
+    .scorecard-grid .kpi-card .kpi-sub {
+      font-size: 0.7rem !important;
+      color: #70757A !important;
+    }
+
+    .scorecard-grid .kpi-card .kpi-icon {
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 8px !important;
+      display: grid !important;
+      place-items: center !important;
+      background-color: var(--md-sys-color-surface-variant) !important;
+      color: var(--md-sys-color-primary) !important;
+      font-size: 18px !important;
+    }
+
+    /* Calendar Container Redesign */
+    .calendar-panel {
+      background: var(--md-sys-color-surface) !important;
+      border-radius: var(--radius-l) !important;
+      padding: 24px !important;
+      box-shadow: var(--shadow-1) !important;
+      border: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 16px !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    .calendar-panel .panel-title {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      border-bottom: none !important;
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    .calendar-panel .panel-title .calendar-title-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .calendar-panel .panel-title .calendar-nav-controls {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+
+    .calendar-panel .panel-title .calendar-period-controls {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      background-color: var(--md-sys-color-surface-variant) !important;
+      padding: 4px !important;
+      border-radius: 100px !important;
+    }
+    
+    .calendar-panel .panel-title .btn-calendar-nav {
+      border: none !important;
+      background: transparent !important;
+      width: 28px !important;
+      height: 28px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 50% !important;
+      cursor: pointer !important;
+      color: var(--text-secondary) !important;
+    }
+    
+    .calendar-panel .panel-title .btn-calendar-nav:hover {
+      background-color: rgba(0,0,0,0.05) !important;
+    }
+    
+    .calendar-panel .panel-title #calendar-month-year {
+      font-size: 0.9rem !important;
+      font-weight: 700 !important;
+      color: var(--md-sys-color-on-surface) !important;
+      padding: 0 4px !important;
+    }
+
+    .calendar-sub-header {
+      border-bottom: none !important;
+      padding-bottom: 0 !important;
+      margin-bottom: 8px !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+
+    .calendar-sub-header .calendar-view-switcher {
+      display: flex !important;
+      background-color: var(--md-sys-color-surface-variant) !important;
+      padding: 4px !important;
+      border-radius: 100px !important;
+      gap: 0 !important;
+    }
+
+    .calendar-sub-header .calendar-view-switcher button {
+      border: none !important;
+      background: transparent !important;
+      padding: 6px 16px !important;
+      border-radius: 100px !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      color: #44474E !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .calendar-sub-header .calendar-view-switcher button.active {
+      background-color: var(--md-sys-color-surface) !important;
+      box-shadow: var(--shadow-1) !important;
+      color: var(--md-sys-color-primary) !important;
+    }
+
+    .calendar-panel .btn-primary-event {
+      background-color: var(--md-sys-color-primary) !important;
+      color: white !important;
+      border: none !important;
+      padding: 8px 20px !important;
+      border-radius: 100px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      font-size: 0.9rem !important;
+      box-shadow: none !important;
+      transition: background 0.2s !important;
+    }
+    
+    .calendar-panel .btn-primary-event:hover {
+      background-color: #5829E0 !important;
+    }
+
+    /* Calendar Grid */
+    .calendar-widget-body {
+      border-top: 1px solid var(--md-sys-color-outline) !important;
+      border-left: 1px solid var(--md-sys-color-outline) !important;
+      border-radius: 8px !important;
+      overflow: hidden !important;
+    }
+
+    /* Day name headers */
+    .calendar-days-grid {
+      grid-gap: 0 !important;
+    }
+
+    .calendar-days-grid .day-name {
+      text-align: center !important;
+      padding: 12px !important;
+      font-weight: 700 !important;
+      font-size: 0.8rem !important;
+      color: #5F6368 !important;
+      background-color: #FAFAFD !important;
+      border-right: 1px solid var(--md-sys-color-outline) !important;
+      border-bottom: 1px solid var(--md-sys-color-outline) !important;
+    }
+
+    /* Calendar Day Cells */
+    .calendar-day-cell {
+      min-height: 100px !important;
+      height: auto !important;
+      background-color: var(--md-sys-color-surface) !important;
+      border-right: 1px solid var(--md-sys-color-outline) !important;
+      border-bottom: 1px solid var(--md-sys-color-outline) !important;
+      padding: 8px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4px !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+    }
+
+    .calendar-day-cell.other-month {
+      background-color: #F8F9FE !important;
+    }
+
+    .calendar-day-cell.other-month .calendar-day-number {
+      opacity: 0.4 !important;
+    }
+
+    .calendar-day-number {
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+      color: #70757A !important;
+      width: 24px !important;
+      height: 24px !important;
+      display: grid !important;
+      place-items: center !important;
+      border-radius: 50% !important;
+      margin: 0 !important;
+      position: static !important;
+    }
+
+    /* Today cell highlight */
+    .calendar-day-cell.today .calendar-day-number {
+      background-color: var(--md-sys-color-primary) !important;
+      color: white !important;
+      opacity: 1 !important;
+    }
+
+    /* Event chips colors matching Toty's aesthetics */
+    .calendar-event-item {
+      font-size: 0.72rem !important;
+      padding: 4px 6px !important;
+      border-radius: 4px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      font-weight: 500 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .calendar-event-item.entrevista { 
+      background-color: #F3E5F5 !important; 
+      color: #7B1FA2 !important; 
+      border-left: 3px solid #9C27B0 !important; 
+    }
+    
+    .calendar-event-item.call { 
+      background-color: #E3F2FD !important; 
+      color: #1565C0 !important; 
+      border-left: 3px solid #1976D2 !important; 
+    }
+    
+    .calendar-event-item.call_6m { 
+      background-color: #FFF3E0 !important; 
+      color: #E65100 !important; 
+      border-left: 3px solid #EF6C00 !important; 
+    }
+    
+    .calendar-event-item.doc { 
+      background-color: #EDE7FF !important; 
+      color: #6E3AFF !important; 
+      border-left: 3px solid #6E3AFF !important; 
+    }
+    
+    .calendar-event-item.other { 
+      background-color: #F3F4F8 !important; 
+      color: #44474E !important; 
+      border-left: 3px solid #BCC2CD !important; 
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    .modal {
+      border-radius: var(--radius-l) !important;
+      box-shadow: var(--shadow-2) !important;
+      border: none !important;
+    }
+
+    /* Collapsed Sidebar CSS Rules overrides */
+    .sidebar-left.collapsed {
+      width: 78px !important;
+      padding: 24px 10px !important;
+    }
+
+    .sidebar-left.collapsed .sidebar-nav .nav-label,
+    .sidebar-left.collapsed .campaign-card {
+      display: none !important;
+    }
+
+    .sidebar-left.collapsed .brand-name {
+      max-width: 0;
+      opacity: 0;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: opacity 0.2s ease, max-width 0.3s ease;
+    }
+
+    .sidebar-left.collapsed .sidebar-branding {
+      justify-content: center !important;
+      padding: 0 !important;
+      gap: 0 !important;
+    }
+
+    .sidebar-left.collapsed .sidebar-nav .nav-item {
+      justify-content: center !important;
+      padding: 12px 0 !important;
+      border-radius: 50% !important;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto;
+      gap: 0 !important;
+    }
+
+    .sidebar-left.collapsed .sidebar-nav .nav-item span:not(.material-symbols-outlined) {
+      max-width: 0;
+      opacity: 0;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: opacity 0.2s ease, max-width 0.3s ease;
+    }
+
+    /* Móvil: drawer expandido + reseteo de colapsado */
+    @media (max-width: 768px) {
+      .sidebar-left.collapsed {
+        width: 260px !important;
+        padding: 24px 16px !important;
+      }
+
+      .sidebar-left.collapsed .brand-name,
+      .sidebar-left.collapsed .sidebar-nav .nav-label,
+      .sidebar-left.collapsed .sidebar-nav .nav-item span:not(.material-symbols-outlined),
+      .sidebar-left.collapsed .campaign-card {
+        display: block !important;
+      }
+
+      .sidebar-left.collapsed .brand-name {
+        max-width: 200px;
+        opacity: 1;
+      }
+
+      .sidebar-left.collapsed .sidebar-branding {
+        justify-content: flex-start !important;
+        padding: 0 12px !important;
+        gap: 12px !important;
+      }
+
+      .sidebar-left.collapsed .sidebar-nav .nav-item {
+        justify-content: flex-start !important;
+        padding: 12px 16px !important;
+        border-radius: 100px !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        gap: 12px !important;
+      }
+
+      .sidebar-left.collapsed .sidebar-nav .nav-item span:not(.material-symbols-outlined) {
+        max-width: 200px;
+        opacity: 1;
+      }
+    }
+
+    /* Scrollbar override */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D1D5DB;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9CA3AF;
+    }
+  </style>
+</head>
+<body>  <div class="dashboard-wrapper">
+    <!-- Backdrop móvil: cierra drawer al tocar fuera -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+    <!-- Left Sidebar (Redesigned Material 3 Navigation Drawer) -->
+    <aside class="sidebar-left" id="dashboard-col-left">
+    <script>if (localStorage.getItem('bells-sidebar-collapsed') === 'true') { document.getElementById('dashboard-col-left').classList.add('collapsed'); }</script>
+      <!-- Branding -->
+      <div class="sidebar-branding">
+        <div class="brand-icon">
+          <span class="material-symbols-outlined">notifications_active</span>
+        </div>
+        <span class="brand-name">BellsGroup</span>
+      </div>
+
+      <!-- Navigation Groups -->
+      <nav class="sidebar-nav">
+        <span class="nav-label">General</span>
+        <a href="dashboard.html" class="nav-item active">
+          <span class="material-symbols-outlined">dashboard</span> <span>Dashboard</span>
+        </a>
+        <a href="Clientes.html" class="nav-item">
+          <span class="material-symbols-outlined">group</span> <span>Clientes</span>
+        </a>
+        <a href="Embudo.html" class="nav-item">
+          <span class="material-symbols-outlined">filter_alt</span> <span>Embudo de ventas</span>
+        </a>
+        <a href="Comisiones.html" class="nav-item">
+          <span class="material-symbols-outlined">payments</span> <span>Comisiones</span>
+        </a>
+        
+        <span class="nav-label" style="margin-top: 12px;">Herramientas</span>
+        <a href="#" class="nav-item" onclick="openProspectModal(); return false;">
+          <span class="material-symbols-outlined">person_add</span> <span>Registrar Prospecto</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openSimulationsModal(); return false;">
+          <span class="material-symbols-outlined">calculate</span> <span>Simulaciones</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openReportModal(); return false;">
+          <span class="material-symbols-outlined">download</span> <span>Reportes</span>
+        </a>
+        <a href="Configuracion-vendedor.html" class="nav-item">
+          <span class="material-symbols-outlined">settings</span> <span>Configuración</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openHistoryModal(); return false;">
+          <span class="material-symbols-outlined">history</span> <span>Historial Reciente</span>
+        </a>
+      </nav>
+
+      <!-- Dynamic campaign cards rendered at bottom, styled via CSS overrides -->
+      <div class="campaign-card" id="campaign-list-container">
+        <!-- Cargado dinámicamente -->
+      </div>
+
+      <!-- Toggle colapso (chevron) -->
+      <button id="sidebar-collapse-btn" class="sidebar-collapse-btn" onclick="toggleSidebar()" title="Colapsar sidebar" aria-controls="dashboard-col-left" aria-expanded="true">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <header class="top-header">
+        <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Colapsar sidebar" aria-controls="dashboard-col-left" aria-expanded="true" style="margin-right: auto;">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="zurich-status" id="sync-container" onclick="triggerManualSync()" title="Hacer clic para sincronizar manualmente">
+          <div class="sync-dot"></div>
+          <span id="sync-time-text">Zurich Sync: OK (12 min)</span>
+        </div>
+
+        <div class="user-profile">
+          <a href="../General/Mi perfil.html" class="d-flex items-center gap-10 c-inherit td-none">
+            <div class="user-avatar" id="user-avatar">C</div>
+            <div class="user-info">
+              <span class="user-name" id="user-display-name">Carlos</span>
+              <span class="user-role" id="user-display-role">Asesor Comercial</span>
+            </div>
+          </a>
+          <button class="logout-btn" onclick="logout()" title="Cerrar sesión">
+            <i class="fa-solid fa-power-off"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Dashboard Body -->
+      <main class="dashboard-body" id="dashboard-col-center">
+
+      <!-- Encabezado de Bienvenida -->
+      <div class="welcome-header">
+        <div>
+          <h2 class="welcome-title">Hola, <span id="welcome-user-name">Carlos</span></h2>
+          <p class="welcome-subtitle" id="welcome-date">Hoy</p>
+        </div>
+        <div class="welcome-summary" id="welcome-summary"></div>
+      </div>
+      
+      <!-- Alerta de Rendimiento de Asesores (Filtrada por Rol en JS) -->
+      <div class="alerts-card mb-0">
+        <span class="material-symbols-outlined">warning</span>
+        <div class="alerts-content">
+          <strong>Alerta de Rendimiento de Asesores:</strong>
+          <span>El asesor <strong>Pedro A.</strong> registra una conversión del <strong>6.6%</strong>, por debajo del umbral mínimo del equipo (10%). Se recomienda programar una sesión de revisión y speech de ventas.</span>
+        </div>
+      </div>
+
+      <!-- Buscador Inteligente con IA (Prototipo UI/UX) -->
+      <div class="panel ai-search-panel mb-0">
+        <div class="ai-search-container">
+          <div class="ai-input-group">
+            <span class="material-symbols-outlined">auto_awesome</span>
+            <input type="text" id="ai-search-input" placeholder="Pregúntale a la IA (ej. 'Clientes con planes a largo plazo sin contacto...')" onkeypress="handleAiSearchKeyPress(event)" oninput="toggleAiSearchClear()">
+            <button type="button" class="ai-search-clear" id="ai-search-clear" onclick="clearAiSearch()" aria-label="Limpiar búsqueda" title="Limpiar búsqueda" style="display: none;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+            <button class="btn-ai-search" id="ai-search-btn" onclick="executeAiSearch()">
+              <span class="material-symbols-outlined" style="font-size: 18px;">search</span>
+              Consultar
+            </button>
+          </div>
+
+          <div class="chips-container" style="margin-top: 12px;">
+            <span class="chip-label">Sugerencias rápidas:</span>
+            <button type="button" class="chip" onclick="applyAiSuggestion('Clientes con planes a largo plazo sin contacto en los últimos 2 meses')">Sin contacto hace 2 meses</button>
+            <button type="button" class="chip" onclick="applyAiSuggestion('Clientes con solo un seguro y que sea mayor a 3000 USD anuales')">Seguro > $3,000 USD/año</button>
+            <button type="button" class="chip" onclick="applyAiSuggestion('Clientes con seguro superior a 200 USD mensual y sin contacto en los últimos 6 meses')">Seguro > $200/mes sin contacto (6m)</button>
+          </div>
+
+          <!-- Loading Indicator -->
+          <div class="ai-searching-loader" id="ai-search-loader" style="display: none; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary); margin-top: 10px;">
+            <div class="ai-loader-spinner" style="width: 16px; height: 16px; border: 2px solid var(--border-color); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <span>La IA está procesando tu consulta coloquial...</span>
+          </div>
+
+          <!-- Results Box -->
+          <div class="ai-results-card" id="ai-results-card" style="display: none; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card-solid); margin-top: 12px; box-shadow: var(--shadow-sm); overflow: hidden;">
+            <div class="ai-results-header" style="background: var(--bg-muted); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color);">
+              <span class="ai-results-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12.5px; color: var(--text-primary);">
+                <i class="fa-solid fa-robot c-primary"></i>
+                <span>Resultados de la Búsqueda IA</span>
+              </span>
+              <div class="d-flex items-center gap-8">
+                <span class="ai-results-count" id="ai-results-count" style="font-weight: 700; font-size: 11px; background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: var(--radius-sm);">0</span>
+                <button type="button" class="ai-results-close" onclick="closeAiResults()" style="background: transparent; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer;">&times;</button>
+              </div>
+            </div>
+            <div class="ai-results-list" id="ai-results-list">
+              <!-- Cargado dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Scorecard (4 KPIs) -->
+      <div class="scorecard-grid">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Prima Promedio</span>
+            <div class="kpi-icon"><span class="material-symbols-outlined">sell</span></div>
+          </div>
+          <div class="kpi-value" id="kpi-api">$1.200</div>
+          <div class="kpi-sub" id="kpi-api-period-desc">Monto medio (Todo el historial)</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Comisión promedio por venta</span>
+            <div class="kpi-icon"><span class="material-symbols-outlined">payments</span></div>
+          </div>
+          <div class="kpi-value" id="kpi-commission">$28.800</div>
+          <div class="kpi-sub">
+            <span>Proyección: </span>
+            <span id="kpi-commission-monthly" style="font-weight:700; color:var(--color-success);">$2.400</span>
+            <span>/mes</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Tasa de Conversión</span>
+            <div class="kpi-icon"><span class="material-symbols-outlined">percent</span></div>
+          </div>
+          <div class="kpi-value" id="kpi-conversion">15.0%</div>
+          <div class="kpi-sub" id="kpi-conversion-period-desc">Esfuerzo pipeline general</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Prospectos Activos</span>
+            <div class="kpi-icon"><span class="material-symbols-outlined">groups</span></div>
+          </div>
+          <div class="kpi-value" id="kpi-prospects">18</div>
+          <div class="kpi-sub" id="kpi-ready-cierre-count" style="color: var(--color-success); font-weight:700;">6 listos para cierre</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Ingreso Total Generado</span>
+            <div class="kpi-icon"><span class="material-symbols-outlined">account_balance</span></div>
+          </div>
+          <div class="kpi-value" id="kpi-total-income">$0</div>
+          <div class="kpi-sub">
+            <span id="kpi-total-income-ars">$0 ARS</span>
+            <span id="kpi-total-income-desc" style="display:block; margin-top:4px;">Portafolio simulado (emitido + cobrado, anualizado)</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Ingreso Mensual</span>
+            <div class="kpi-icon"><span class="material-symbols-outlined">trending_up</span></div>
+          </div>
+          <div class="kpi-value" id="kpi-monthly-income-usd">$0 USD</div>
+          <div class="kpi-sub">
+            <span id="kpi-monthly-income-ars">$0 ARS</span>
+            <span id="kpi-rate-today" style="display:block; margin-top:4px; color:var(--color-green-text); font-weight:600;">Cotización del día: 1 USD = $1.300 ARS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendario de Planificación Comercial -->
+      <div class="calendar-panel">
+        <div class="panel-title">
+          <div class="calendar-title-text">
+            <span class="material-symbols-outlined" style="color:var(--md-sys-color-primary);">calendar_month</span>
+            <span>Calendario de Planificación Comercial</span>
+          </div>
+          <div class="calendar-nav-controls">
+            <div class="calendar-period-controls">
+              <button class="btn-calendar-nav" id="calendar-prev-month" onclick="changeCalendarMonth(-1)" aria-label="Mes anterior" title="Mes anterior"><span class="material-symbols-outlined">chevron_left</span></button>
+              <span id="calendar-month-year" aria-live="polite">-</span>
+              <button class="btn-calendar-nav" id="calendar-next-month" onclick="changeCalendarMonth(1)" aria-label="Mes siguiente" title="Mes siguiente"><span class="material-symbols-outlined">chevron_right</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="calendar-sub-header">
+          <div class="calendar-view-switcher" role="group" aria-label="Vista de calendario">
+            <button type="button" class="calendar-view-btn" data-calendar-view="day" onclick="setCalendarView('day')">Día</button>
+            <button type="button" class="calendar-view-btn" data-calendar-view="week" onclick="setCalendarView('week')">Semana</button>
+            <button type="button" class="calendar-view-btn active" data-calendar-view="month" onclick="setCalendarView('month')">Mes</button>
+            <button type="button" class="calendar-view-btn" data-calendar-view="year" onclick="setCalendarView('year')">Año</button>
+            <button type="button" class="calendar-view-btn" data-calendar-view="agenda" onclick="setCalendarView('agenda')">Agenda</button>
+            <button type="button" class="calendar-view-btn" data-calendar-view="four-days" onclick="setCalendarView('four-days')">4 días</button>
+          </div>
+          <button class="btn-primary-event" onclick="openAddEventModal()" title="Planificar nueva actividad">
+            <span class="material-symbols-outlined" style="font-size:18px;">add</span>
+            <span>Nuevo Evento</span>
+          </button>
+        </div>
+
+        <div class="calendar-widget-body">
+          <!-- Calendario Grid -->
+          <div class="calendar-grid-container">
+            <div class="calendar-weekdays">
+              <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span>
+            </div>
+            <div class="calendar-days-grid" id="calendar-days-grid">
+              <!-- Se genera dinámicamente -->
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+
+
+      </main>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER FOR NOTIFICATIONS -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- MODAL: DETALLES DEL DÍA SELECCIONADO -->
+  <div class="modal-backdrop" id="selected-day-modal" onclick="closeSelectedDayModalOnBackdrop(event)">
+    <div class="modal" style="max-width: 450px; width: 95%;">
+      <div class="modal-header">
+        <h3 class="modal-title d-flex items-center gap-8">
+          <i class="fa-solid fa-list-check c-primary"></i>
+          <span id="selected-day-label">Tareas para Hoy</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeSelectedDayModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div class="calendar-events-list" id="selected-day-events" style="max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+          <!-- Se cargan dinámicamente -->
+        </div>
+        <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+          <i class="fa-solid fa-circle-info mr-4"></i> Haz clic en los botones para reprogramar actividades o marcarlas como completadas.
+        </div>
+        <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="btn btn-secondary" onclick="closeSelectedDayModal()">Cerrar</button>
+          <button class="btn btn-primary" onclick="openAddEventModalFromDay()">
+            <i class="fa-solid fa-plus"></i> Nueva Actividad
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SIMULACIONES Y OBJETIVOS -->
+  <div class="modal-backdrop" id="simulations-modal" onclick="closeSimulationsModalOnBackdrop(event)">
+    <div class="modal" style="max-width: 950px; width: 90%;">
+      <div class="modal-header">
+        <h3 class="modal-title d-flex items-center gap-8">
+          <i class="fa-solid fa-calculator c-primary"></i>
+          <span>Simulador de Objetivos y Comisiones Proyectadas</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeSimulationsModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; padding: 20px;">
+        
+        <!-- Columna Izquierda: Gráfico de Comisiones -->
+        <div class="d-flex-col gap-14">
+          <div style="font-weight: 700; font-size: 13.5px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+            <i class="fa-solid fa-chart-line c-primary mr-6"></i>Proyección de Comisiones
+          </div>
+          <div class="chart-wrapper" style="height: 300px; position: relative;">
+            <canvas id="mainDashboardChart"></canvas>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+            * El gráfico muestra las comisiones tentativas en base a las primas anuales proyectadas y la tasa de comisión configurada.
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Calculadora e inputs del Simulador -->
+        <div style="display: flex; flex-direction: column; gap: 16px; border-left: 1px solid var(--border-color); padding-left: 20px;">
+          <div style="font-weight: 700; font-size: 13.5px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span><i class="fa-solid fa-sliders c-primary mr-6"></i>Parámetros Comerciales</span>
+            <span class="gauge-percentage" id="gauge-percent" style="font-size: 13px; font-weight: 700; background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: var(--radius-sm);">0%</span>
+          </div>
+
+          <!-- Gauge and Target input combined horizontally -->
+          <div style="display: flex; align-items: center; gap: 16px; justify-content: space-between;">
+            <div class="target-gauge-container" style="width: 100px; height: 100px; padding: 0; min-height: 100px; position: relative; display: flex; align-items: center; justify-content: center;">
+              <svg class="gauge-svg" viewBox="0 0 140 140" style="width: 100px; height: 100px; transform: rotate(-90deg);">
+                <circle class="gauge-bg" cx="70" cy="70" r="60" style="fill: none; stroke: var(--border-color); stroke-width: 8;" />
+                <circle class="gauge-progress" id="gauge-progress" cx="70" cy="70" r="60" style="fill: none; stroke: url(#primaryGradModal); stroke-width: 8; stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset 0.5s ease;" />
+              </svg>
+              <!-- SVG Gradient -->
+              <svg style="width:0; height:0; position:absolute;">
+                <defs>
+                  <linearGradient id="primaryGradModal" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#7c3aed" />
+                    <stop offset="100%" stop-color="#6d28d9" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="gauge-center-text" style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <span class="gauge-percentage" id="gauge-percent-center" style="font-size: 16px; font-weight: 700;">0%</span>
+                <span class="gauge-label" style="font-size: 8px; text-transform: uppercase; color: var(--text-muted);">Meta</span>
+              </div>
+            </div>
+
+            <div class="goal-input-box" style="flex: 1; margin: 0;">
+              <label class="goal-input-label c-secondary fs-11 fw-700" for="target-monthly-income">Meta Deseada / Mes</label>
+              <div class="goal-input-wrapper" style="margin-top: 4px; display: flex; align-items: center; position: relative;">
+                <span class="goal-currency" style="position: absolute; left: 10px; font-size: 13px; font-weight: 700; color: var(--text-muted);">$</span>
+                <input type="number" id="target-monthly-income" class="goal-input" value="3000" min="500" max="50000" step="100" oninput="calculateProjections()" style="padding: 6px 10px 6px 22px; font-size: 13px; width: 100%; border: 1px solid var(--border-color); border-radius: var(--radius-sm); outline: none;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Sliders Stack -->
+          <div class="calc-inputs-stack d-flex-col gap-10">
+            <div class="calc-input-group">
+              <div class="calc-label-row d-flex justify-between mb-2">
+                <span class="calc-label c-secondary fs-11 fw-700">Conversión de contactos</span>
+                <span class="calc-value c-primary fs-11 fw-700" id="val-contacts">30</span>
+              </div>
+              <input type="range" id="slider-contacts" class="calc-slider accent-primary w-100" min="5" max="100" value="30" oninput="calculateProjections()">
+            </div>
+
+            <div class="calc-input-group">
+              <div class="calc-label-row d-flex justify-between mb-2">
+                <span class="calc-label c-secondary fs-11 fw-700">Reuniones efectivas a cierre</span>
+                <span class="calc-value c-primary fs-11 fw-700" id="val-conversion">15%</span>
+              </div>
+              <input type="range" id="slider-conversion" class="calc-slider accent-primary w-100" min="1" max="50" value="15" oninput="calculateProjections()">
+            </div>
+
+            <div class="calc-input-group">
+              <div class="calc-label-row d-flex justify-between mb-2">
+                <span class="calc-label c-secondary fs-11 fw-700">Promedio prima vendida</span>
+                <span class="calc-value c-primary fs-11 fw-700" id="val-premium-avg">$1,200</span>
+              </div>
+              <input type="range" id="slider-premium-avg" class="calc-slider accent-primary w-100" min="200" max="10000" step="100" value="1200" oninput="calculateProjections()">
+            </div>
+
+            <div class="calc-input-group">
+              <div class="calc-label-row d-flex justify-between mb-2">
+                <span class="calc-label c-secondary fs-11 fw-700">Comisión promedio por venta</span>
+                <span class="calc-value c-primary fs-11 fw-700" id="val-commission">40%</span>
+              </div>
+              <input type="range" id="slider-commission" class="calc-slider accent-primary w-100" min="10" max="90" value="40" oninput="calculateProjections()">
+            </div>
+          </div>
+
+          <!-- Simulation Breakdown Outputs -->
+          <div class="results-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 6px;">
+            <div class="result-box highlighted" style="padding: 8px; text-align: center; border-radius: var(--radius-sm); background: var(--primary-light); border: 1px solid rgba(124,58,237,0.15);">
+              <div class="result-title c-secondary fs-9 fw-700 text-uppercase">Ingreso Mensual</div>
+              <div class="result-value" id="res-monthly-income" style="font-size: 13px; font-weight: 700; margin-top: 2px; color: var(--primary);">$9,360</div>
+            </div>
+            <div class="result-box" style="padding: 8px; text-align: center; border-radius: var(--radius-sm); background: var(--bg-muted); border: 1px solid var(--border-color);">
+              <div class="result-title c-secondary fs-9 fw-700 text-uppercase">Prima Anual</div>
+              <div class="result-value" id="res-annual-premium" style="font-size: 13px; font-weight: 700; margin-top: 2px; color: var(--text-primary);">$280,800</div>
+            </div>
+            <div class="result-box" style="padding: 8px; text-align: center; border-radius: var(--radius-sm); background: var(--bg-muted); border: 1px solid var(--border-color);">
+              <div class="result-title c-secondary fs-9 fw-700 text-uppercase">Cierres/Mes</div>
+              <div class="result-value" id="res-sales-needed" style="font-size: 13px; font-weight: 700; margin-top: 2px; color: var(--text-primary);">2.3</div>
+            </div>
+          </div>
+          
+          <div id="goal-status-box" style="font-size: 11px; padding: 8px 12px; border-radius: var(--radius-sm); text-align: center; font-weight: 600;">
+            <!-- Rellenado dinámicamente -->
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color);">
+        <button type="button" class="btn btn-primary" onclick="closeSimulationsModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Dialog Modal (Sincronizado con Embudo.html) -->
+  <dialog id="new-prospect-dialog" closedby="any" aria-labelledby="dialog-title">
+    <div class="dialog-header">
+      <h3 id="dialog-title" class="fw-700">Registrar nuevo prospecto</h3>
+      <button class="dialog-close" onclick="document.getElementById('new-prospect-dialog').close()">&times;</button>
+    </div>
+    <form class="dialog-form" id="new-prospect-form" onsubmit="event.preventDefault(); addProspect();">
+      <div class="d-grid gap-12">
+        <div class="form-field">
+          <label class="form-label" for="new-first-name">Nombre</label>
+          <input type="text" id="new-first-name" class="form-input-box" placeholder="Juan" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="new-last-name">Apellido</label>
+          <input type="text" id="new-last-name" class="form-input-box" placeholder="Pérez" required>
+        </div>
+      </div>
+
+      <div class="d-grid gap-12 mt-12">
+        <div class="form-field">
+          <label class="form-label" for="new-doc-type">Tipo de Documento</label>
+          <select id="new-doc-type" class="form-input-box" required>
+            <option value="" disabled selected>Selecciona...</option>
+            <option value="DNI">DNI</option>
+            <option value="Pasaporte">Pasaporte</option>
+            <option value="CUIT">CUIT</option>
+            <option value="CUIL">CUIL</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="new-doc-number">Número de Documento</label>
+          <input type="text" id="new-doc-number" class="form-input-box" placeholder="35.678.901" required>
+        </div>
+      </div>
+
+      <div class="d-grid gap-12 mt-12">
+        <div class="form-field">
+          <label class="form-label" for="new-cuit">CUIT/CUIL</label>
+          <input type="text" id="new-cuit" class="form-input-box" placeholder="20-30456789-2" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="new-phone">Número de teléfono</label>
+          <input type="text" id="new-phone" class="form-input-box" placeholder="+54 9..." required>
+        </div>
+      </div>
+
+      <div class="form-field mt-12">
+        <label class="form-label" for="new-address">Domicilio</label>
+        <input type="text" id="new-address" class="form-input-box" placeholder="Av. Corrientes 1234, CABA" required>
+      </div>
+
+      <div class="form-field mt-12">
+        <label class="form-label" for="new-segment">Selección de Nicho</label>
+        <select id="new-segment" class="form-input-box" required>
+          <option value="" disabled selected>Selecciona un nicho...</option>
+          <option value="Médico">Médico</option>
+          <option value="Empresa">Empresa</option>
+          <option value="Abogado">Abogado</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+
+      <div class="d-grid gap-12 mt-12">
+        <div class="form-field">
+          <label class="form-label" for="new-gender">Género</label>
+          <select id="new-gender" class="form-input-box" required>
+            <option value="" disabled selected>Selecciona una opción...</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="new-birthdate">Fecha de Nacimiento</label>
+          <input type="date" id="new-birthdate" class="form-input-box" required>
+        </div>
+      </div>
+
+      <div class="d-grid gap-12 mt-12">
+        <div class="form-field">
+          <label class="form-label" for="new-has-children">¿Tiene Hijos?</label>
+          <select id="new-has-children" class="form-input-box" onchange="toggleChildrenField(this.value, 'new-children-count')" required>
+            <option value="" disabled selected>Selecciona...</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div class="form-field d-none" id="new-children-count-wrapper">
+          <label class="form-label" for="new-children-count">¿Cuántos hijos?</label>
+          <input type="number" id="new-children-count" class="form-input-box" min="1" placeholder="Cantidad">
+        </div>
+      </div>
+
+      <div class="d-grid gap-12 mt-12">
+        <div class="form-field">
+          <label class="form-label" for="new-is-referred">¿Es un Referido?</label>
+          <select id="new-is-referred" class="form-input-box" onchange="toggleReferredField(this.value, 'new-referred-by')" required>
+            <option value="" disabled selected>Selecciona...</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div class="form-field d-none" id="new-referred-by-wrapper">
+          <label class="form-label" for="new-referred-by">¿Referido de quién?</label>
+          <input type="text" id="new-referred-by" class="form-input-box" placeholder="Nombre del contacto">
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('new-prospect-dialog').close()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="btn-dialog-submit">
+          <span class="btn-text">Registrar Prospecto</span>
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- FULL HISTORY MODAL -->
+  <div class="modal-backdrop" id="history-modal" onclick="closeHistoryModalOnBackdrop(event)">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title d-flex items-center gap-8">
+          <i class="fa-solid fa-clock-rotate-left c-primary"></i>
+          <span>Historial de Interacciones</span>
+        </h3>
+        <button class="modal-close" onclick="closeHistoryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="activity-timeline" id="full-history-timeline" style="max-height: 400px; overflow-y: auto; padding-right: 4px;">
+          <!-- Cargado dinámicamente -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeHistoryModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMPAIGN DETAILS MODAL -->
+  <div class="modal-backdrop" id="campaign-details-modal" onclick="closeCampaignDetailsModalOnBackdrop(event)">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header bg-primary-gradient">
+        <h3 class="modal-title d-flex items-center gap-8" id="campaign-details-title">
+          <i class="fa-solid fa-bullseye c-primary"></i>
+          <span>Detalles de la Campaña</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeCampaignDetailsModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="campaign-details-body">
+        <!-- Cargado dinámicamente -->
+      </div>
+      <div class="modal-footer" id="campaign-details-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+        <!-- Acciones dinámicas -->
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE PERSONAL CAMPAIGN MODAL -->
+  <div class="modal-backdrop" id="create-campaign-modal" onclick="closeCreateCampaignModalOnBackdrop(event)">
+    <div class="modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title d-flex items-center gap-8">
+          <i class="fa-solid fa-circle-plus c-primary"></i>
+          <span id="create-campaign-modal-title">Crear Nueva Campaña</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeCreateCampaignModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: flex-end;">
+          <div>
+            <label for="new-campaign-name">Nombre de la Campaña</label>
+            <input type="text" id="new-campaign-name" placeholder="Ej. Campaña Zurich Q4" required class="w-100">
+          </div>
+          <div>
+            <label for="new-campaign-type">Tipo de Campaña</label>
+            <select id="new-campaign-type" class="w-100" onchange="handleCampaignTypeChange()">
+              <option value="personal">Incentivo Personal (Auto-promesa)</option>
+              <option value="internal">Interna BellsGroup</option>
+              <option value="zurich">Zurich</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="new-campaign-reward" id="campaign-reward-label">Premio / Incentivo Auto-promesa</label>
+          <input type="text" id="new-campaign-reward" placeholder="Ej. Cena premium / Bono de comisión" required class="w-100">
+        </div>
+        <div class="form-group d-grid gap-12">
+          <div>
+            <label for="new-campaign-goal">Meta (Ventas / Pólizas)</label>
+            <input type="number" id="new-campaign-goal" value="10" min="1" required class="w-100">
+          </div>
+          <div>
+            <label for="new-campaign-icon">Icono Representativo</label>
+            <select id="new-campaign-icon" class="w-100">
+              <option value="fa-gift">Regalo</option>
+              <option value="fa-plane">Viaje</option>
+              <option value="fa-coins">Monedas / Bono</option>
+              <option value="fa-laptop">Tecnología</option>
+              <option value="fa-award">Medalla</option>
+              <option value="fa-car">Automotor</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group d-grid gap-12">
+          <div>
+            <label for="new-campaign-start">Fecha de Inicio</label>
+            <input type="date" id="new-campaign-start" required class="w-100">
+          </div>
+          <div>
+            <label for="new-campaign-end">Fecha de Fin</label>
+            <input type="date" id="new-campaign-end" required class="w-100">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeCreateCampaignModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="submitPersonalCampaign()">Crear Campaña</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOWNLOAD REPORT MODAL -->
+  <div class="modal-backdrop" id="report-modal" onclick="closeReportModalOnBackdrop(event)">
+    <div class="modal mw-450">
+      <div class="modal-header">
+        <h3 class="modal-title d-flex items-center gap-8">
+          <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i>
+          <span>Descargar Reporte Comercial</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeReportModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+          Selecciona el rango de fechas para generar el reporte consolidado de ventas, comisiones y primas estimadas del vendedor.
+        </p>
+        <div class="form-group d-grid gap-12">
+          <div>
+            <label for="report-start-date">Fecha Desde</label>
+            <input type="date" id="report-start-date" required class="w-100">
+          </div>
+          <div>
+            <label for="report-end-date">Fecha Hasta</label>
+            <input type="date" id="report-end-date" required class="w-100">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="submitDownloadReport()">
+          <i class="fa-solid fa-download" style="margin-right: 6px;"></i>Descargar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR TAREA / ENTREVISTA EN CALENDARIO -->
+  <div class="modal-backdrop" id="calendar-event-modal" onclick="closeCalendarEventModalOnBackdrop(event)">
+    <div class="modal mw-450">
+      <div class="modal-header">
+        <h3 class="modal-title d-flex items-center gap-8">
+          <i class="fa-solid fa-calendar-plus c-primary"></i>
+          <span>Planificar Actividad / Pendiente</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeCalendarEventModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="calendar-event-form" onsubmit="submitCalendarEvent(event)">
+          <div class="form-group mb-12">
+            <label for="event-date">Fecha de la Actividad</label>
+            <input type="date" id="event-date" required class="w-100">
+          </div>
+
+          <div class="form-group mb-12">
+            <label for="event-prospect">Vincular Cliente / Prospecto (Embudo)</label>
+            <select id="event-prospect" class="w-100" onchange="onEventProspectChange()">
+              <option value="">-- Seleccionar del Embudo (Opcional) --</option>
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group mb-12">
+            <label for="event-type">Tipo de Actividad</label>
+            <select id="event-type" class="w-100">
+              <option value="entrevista">Entrevista de Ventas</option>
+              <option value="call">Llamada de Seguimiento</option>
+              <option value="call_6m">Llamar en 6 Meses (Reminder)</option>
+              <option value="doc">Solicitud / Entrega de Documentos</option>
+              <option value="other">Otro Pendiente</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-12">
+            <label for="event-title">Título / Tarea</label>
+            <input type="text" id="event-title" required placeholder="Ej: Presentar propuesta de Seguro de Retiro" class="w-100">
+          </div>
+
+          <div class="form-group mb-12">
+            <label for="event-notes">Notas / Observaciones</label>
+            <textarea id="event-notes" placeholder="Detalles de la reunión o llamada..." style="width: 100%; min-height: 60px; font-family: inherit; font-size: 12px; padding: 8px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); resize: vertical;"></textarea>
+          </div>
+          
+          <div class="modal-footer border-top d-flex gap-12 justify-end pb-0 pr-0 pt-12">
+            <button type="button" class="btn btn-secondary" onclick="closeCalendarEventModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Registrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lógica modularizada externa (Refactored) -->
+  <script src="dashboard.js"></script>
+  <!-- Tema compartido (persistencia dark/light) -->
+  <script src="../theme.js"></script>
+  <script>
+    (() => {
+    let calendarView = 'month';
+    const calendarMonthRenderer = window.renderCalendar;
+
+    function setCalendarView(view) {
+      calendarView = view;
+      const widgetBody = document.querySelector('.calendar-widget-body');
+      if (widgetBody) {
+        widgetBody.setAttribute('data-view', view);
+      }
+      const viewNames = { month: 'Mes', week: 'Semana', 'four-days': '4 Días', day: 'Día', year: 'Año', agenda: 'Agenda' };
+      const viewName = viewNames[view] || 'Mes';
+
+      document.querySelectorAll('[data-calendar-view]').forEach(button => {
+        const isActive = button.dataset.calendarView === view;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-pressed', isActive);
+      });
+      const feedbackEl = document.getElementById('calendar-view-feedback');
+      if (feedbackEl) feedbackEl.textContent = `Vista: ${viewName}`;
+      
+      const prevBtn = document.getElementById('calendar-prev-month');
+      const nextBtn = document.getElementById('calendar-next-month');
+      if (prevBtn && nextBtn) {
+        prevBtn.setAttribute('aria-label', `${viewName} anterior`);
+        prevBtn.setAttribute('title', `${viewName} anterior`);
+        nextBtn.setAttribute('aria-label', `${viewName} siguiente`);
+        nextBtn.setAttribute('title', `${viewName} siguiente`);
+      }
+      renderCalendar();
+    }
+
+    function changeCalendarMonth(offset) {
+      const days = calendarView === 'day' ? 1 : calendarView === 'week' ? 7 : calendarView === 'four-days' ? 4 : 0;
+      if (days) {
+        calendarCurrentDate.setDate(calendarCurrentDate.getDate() + (offset * days));
+        calendarSelectedDate = new Date(calendarCurrentDate);
+      } else if (calendarView === 'year') {
+        calendarCurrentDate.setFullYear(calendarCurrentDate.getFullYear() + offset);
+      } else {
+        calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + offset);
+      }
+      renderCalendar();
+      if (days) selectCalendarDate(calendarSelectedDate);
+    }
+
+    function renderCalendar() {
+      const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      const weekdaysElement = document.querySelector('.calendar-weekdays');
+      
+      if (calendarView === 'month') {
+        if (weekdaysElement) weekdaysElement.style.display = '';
+        calendarMonthRenderer();
+        document.getElementById('calendar-month-year').textContent = `${monthNames[calendarCurrentDate.getMonth()]} ${calendarCurrentDate.getFullYear()}`;
+        return;
+      }
+
+      const grid = document.getElementById('calendar-days-grid');
+      const monthYearLabel = document.getElementById('calendar-month-year');
+      const weekdayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      const selected = new Date(calendarCurrentDate);
+      let dates = [];
+
+      if (weekdaysElement) weekdaysElement.style.display = 'none';
+
+      if (calendarView === 'day') {
+        monthYearLabel.textContent = `${weekdayNames[selected.getDay()]} ${selected.getDate()} de ${monthNames[selected.getMonth()]} ${selected.getFullYear()}`;
+        grid.style.gridTemplateColumns = '1fr';
+        
+        const dateStr = toLocalDateStr(selected);
+        const events = getEventsForDate(dateStr);
+        const completedList = loadCompletedEvents();
+        
+        let eventsHtml = '';
+        if (events.length === 0) {
+          eventsHtml = `
+            <div style="text-align: center; padding: 48px 16px; color: var(--text-muted); font-size: 13px; font-style: italic;">
+              <i class="fa-solid fa-calendar-check" style="font-size: 32px; color: var(--primary); opacity: 0.5; margin-bottom: 12px; display: block;"></i>
+              No hay actividades planificadas para este día.
+            </div>
+          `;
+        } else {
+          eventsHtml = events.map(ev => {
+            let iconClass = 'fa-phone';
+            if (ev.type === 'entrevista') iconClass = 'fa-handshake';
+            if (ev.type === 'doc') iconClass = 'fa-file-signature';
+            if (ev.type === 'call_6m') iconClass = 'fa-clock';
+
+            const isCompleted = completedList.includes(`${dateStr}-${ev.title}`);
+            const completedClass = isCompleted ? 'completed-task' : '';
+            const buttonText = isCompleted ? '<i class="fa-solid fa-rotate-left"></i>' : '<i class="fa-solid fa-check"></i> Listo';
+            const buttonClass = isCompleted ? 'btn-event-status undo' : 'btn-event-status done';
+            const escapedTitle = ev.title.replace(/'/g, "\\'");
+
+            return `
+              <div class="calendar-event-item ${ev.type || 'other'} ${completedClass}" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px; margin-bottom: 8px;">
+                <div style="display:flex; align-items:center; gap:12px; flex:1; min-width: 0;">
+                  <i class="fa-solid ${iconClass} event-item-icon" style="font-size: 16px; flex-shrink: 0;"></i>
+                  <div style="display:flex; flex-direction:column; gap:2px; min-width: 0; overflow: hidden;">
+                    <span class="event-item-title" style="font-weight:700; font-size:13px;">${ev.time ? `${ev.time} - ` : ''}${ev.title}</span>
+                    ${ev.notes ? `<span style="font-size:11.5px; color:var(--text-secondary);">${ev.notes}</span>` : ''}
+                  </div>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                  <button class="btn-event-edit" onclick="showInlineDatePicker(event, '${dateStr}', '${escapedTitle}')" title="Modificar fecha">
+                    <i class="fa-solid fa-calendar-day"></i>
+                  </button>
+                  <input type="date" class="inline-date-picker" style="display: none;" value="${dateStr}" onblur="setTimeout(() => renderCalendar(), 200)" onchange="changeEventDate('${dateStr}', '${escapedTitle}', this.value)">
+
+                  <button class="${buttonClass}" onclick="toggleEventCompleted('${dateStr}', '${escapedTitle}')">
+                    ${buttonText}
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        grid.innerHTML = `
+          <div style="padding: 16px; background: var(--bg-card-solid); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+              <h4 style="margin: 0; font-size: 16px; color: var(--text-primary);"><i class="fa-solid fa-calendar-day c-primary mr-8"></i>Agenda del Día</h4>
+              <button class="btn btn-primary fs-11 px-12 py-6" onclick="openAddEventModal()">
+                <i class="fa-solid fa-plus"></i> Nueva Actividad
+              </button>
+            </div>
+            <div class="day-events-list">
+              ${eventsHtml}
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (calendarView === 'agenda') {
+        monthYearLabel.textContent = 'Agenda de Actividades';
+        grid.style.gridTemplateColumns = '1fr';
+        
+        const activeDays = [];
+        for (let day = 0; day < 30; day++) {
+          const d = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate() + day);
+          const dateStr = toLocalDateStr(d);
+          const events = getEventsForDate(dateStr);
+          if (events.length > 0) {
+            activeDays.push({ date: d, dateStr, events });
+          }
+        }
+
+        if (activeDays.length === 0) {
+          grid.innerHTML = `
+            <div style="text-align: center; padding: 48px 16px; background: var(--bg-card-solid); border: 1px solid var(--border-color); border-radius: var(--radius-lg); color: var(--text-muted); font-size: 13px; font-style: italic; width: 100%;">
+              <i class="fa-solid fa-calendar-xmark" style="font-size: 32px; color: var(--text-muted); opacity: 0.5; margin-bottom: 12px; display: block;"></i>
+              No hay actividades planificadas para los próximos 30 días.
+            </div>
+          `;
+          return;
+        }
+
+        const completedList = loadCompletedEvents();
+
+        grid.innerHTML = activeDays.map(day => {
+          const dayName = weekdayNames[day.date.getDay()].substring(0, 3).toUpperCase();
+          const monthName = monthNames[day.date.getMonth()].substring(0, 3);
+          
+          const eventsHtml = day.events.map(ev => {
+            let iconClass = 'fa-phone';
+            if (ev.type === 'entrevista') iconClass = 'fa-handshake';
+            if (ev.type === 'doc') iconClass = 'fa-file-signature';
+            if (ev.type === 'call_6m') iconClass = 'fa-clock';
+
+            const isCompleted = completedList.includes(`${day.dateStr}-${ev.title}`);
+            const completedClass = isCompleted ? 'completed-task' : '';
+            const buttonText = isCompleted ? '<i class="fa-solid fa-rotate-left"></i>' : '<i class="fa-solid fa-check"></i> Listo';
+            const buttonClass = isCompleted ? 'btn-event-status undo' : 'btn-event-status done';
+            const escapedTitle = ev.title.replace(/'/g, "\\'");
+
+            return `
+              <div class="calendar-event-item ${ev.type || 'other'} ${completedClass}" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-card-solid);">
+                <div style="display:flex; align-items:center; gap:10px; flex:1; min-width: 0;">
+                  <i class="fa-solid ${iconClass} event-item-icon" style="font-size: 14px; flex-shrink: 0;"></i>
+                  <div style="display:flex; flex-direction:column; gap:2px; min-width: 0; overflow: hidden;">
+                    <span class="event-item-title" style="font-weight:700; font-size:12px;">${ev.time ? `${ev.time} - ` : ''}${ev.title}</span>
+                    ${ev.notes ? `<span style="font-size:11px; color:var(--text-secondary);">${ev.notes}</span>` : ''}
+                  </div>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                  <button class="btn-event-edit" onclick="showInlineDatePicker(event, '${day.dateStr}', '${escapedTitle}')" title="Modificar fecha">
+                    <i class="fa-solid fa-calendar-day"></i>
+                  </button>
+                  <input type="date" class="inline-date-picker" style="display: none;" value="${day.dateStr}" onblur="setTimeout(() => renderCalendar(), 200)" onchange="changeEventDate('${day.dateStr}', '${escapedTitle}', this.value)">
+
+                  <button class="${buttonClass}" onclick="toggleEventCompleted('${day.dateStr}', '${escapedTitle}')">
+                    ${buttonText}
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          return `
+            <div class="agenda-row">
+              <div class="agenda-date-badge">
+                <span class="agenda-day-name">${dayName}</span>
+                <span class="agenda-day-num">${day.date.getDate()}</span>
+                <span class="agenda-month-name">${monthName}</span>
+              </div>
+              <div class="agenda-events-container">
+                ${eventsHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+        return;
+      }
+
+      if (calendarView === 'year') {
+        monthYearLabel.textContent = selected.getFullYear();
+        grid.style.gridTemplateColumns = 'repeat(3, minmax(0, 1fr))';
+        for (let month = 0; month < 12; month++) dates.push(new Date(selected.getFullYear(), month, 1));
+      } else {
+        const count = calendarView === 'week' ? 7 : calendarView === 'four-days' ? 4 : 1;
+        const start = new Date(selected);
+        if (calendarView === 'week') start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+        const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + count - 1);
+        monthYearLabel.textContent = start.getMonth() === end.getMonth()
+          ? `${monthNames[start.getMonth()]} ${start.getDate()} – ${end.getDate()}, ${start.getFullYear()}`
+          : `${monthNames[start.getMonth()]} ${start.getDate()} – ${monthNames[end.getMonth()]} ${end.getDate()}, ${end.getFullYear()}`;
+        grid.style.gridTemplateColumns = `repeat(${count}, minmax(0, 1fr))`;
+        for (let day = 0; day < count; day++) dates.push(new Date(start.getFullYear(), start.getMonth(), start.getDate() + day));
+      }
+
+      grid.innerHTML = dates.map(date => {
+        const dateStr = toLocalDateStr(date);
+        const events = getEventsForDate(dateStr);
+        const isSelected = calendarSelectedDate && dateStr === toLocalDateStr(calendarSelectedDate);
+        
+        if (calendarView === 'year') {
+          const totalEvents = Array.from({ length: new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate() }, (_, day) => getEventsForDate(toLocalDateStr(new Date(date.getFullYear(), date.getMonth(), day + 1))).length).reduce((total, count) => total + count, 0);
+          return `
+            <div class="calendar-day-cell ${isSelected ? 'selected' : ''}" data-date="${dateStr}" onclick="selectCalendarViewDate('${dateStr}')" style="min-height: 92px; padding: 10px;">
+              <span class="calendar-day-number" style="font-weight: 700;">${monthNames[date.getMonth()]}</span>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">
+                ${totalEvents} ${totalEvents === 1 ? 'actividad' : 'actividades'}
+              </div>
+            </div>
+          `;
+        }
+
+        const dayAbbr = weekdayNames[date.getDay()].substring(0, 3).toUpperCase();
+        const isToday = date.toDateString() === new Date().toDateString();
+        const headerHtml = `
+          <div class="calendar-day-header">
+            <span class="day-abbr">${dayAbbr}</span>
+            <span class="day-num ${isToday ? 'today-highlight' : ''}">${date.getDate()}</span>
+          </div>
+        `;
+
+        const eventListHtml = events.length ? events.map(event => {
+          const timeStr = event.time ? `<span style="font-weight: 700; margin-right: 4px;">${event.time}</span>` : '';
+          return `
+            <div class="calendar-event-item ${event.type || 'other'}" title="${event.title}${event.notes ? ` - ${event.notes}` : ''}">
+              ${timeStr}${event.title}
+            </div>
+          `;
+        }).join('') : '<div style="font-size: 10px; color: var(--text-muted); margin-top: 8px; text-align: center; font-style: italic;">Sin actividades</div>';
+
+        return `
+          <div class="calendar-day-cell ${isSelected ? 'selected' : ''}" data-date="${dateStr}" onclick="selectCalendarViewDate('${dateStr}')" style="min-height: 240px; padding: 10px;">
+            ${headerHtml}
+            <div class="calendar-column-events" style="display: flex; flex-direction: column; gap: 4px; width: 100%; overflow-y: auto; flex: 1;">
+              ${eventListHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectCalendarViewDate(dateStr) {
+      calendarSelectedDate = new Date(`${dateStr}T00:00:00`);
+      if (calendarView !== 'week') calendarCurrentDate = new Date(calendarSelectedDate);
+      selectCalendarDate(calendarSelectedDate);
+      if (calendarView !== 'agenda') renderCalendar();
+      
+      if (calendarView !== 'day' && calendarView !== 'agenda') {
+        openSelectedDayModal();
+      }
+    }
+
+    function openSelectedDayModal() {
+      const modal = document.getElementById('selected-day-modal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeSelectedDayModal() {
+      const modal = document.getElementById('selected-day-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function closeSelectedDayModalOnBackdrop(e) {
+      if (e.target.id === 'selected-day-modal') closeSelectedDayModal();
+    }
+
+    function openAddEventModalFromDay() {
+      closeSelectedDayModal();
+      openAddEventModal();
+    }
+
+    function toggleSidebar(force) {
+      const sidebar = document.getElementById('dashboard-col-left');
+      if (!sidebar) return;
+      if (window.innerWidth <= 768) {
+        const open = typeof force === 'boolean' ? force : !sidebar.classList.contains('mobile-open');
+        sidebar.classList.toggle('mobile-open', open);
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (backdrop) backdrop.classList.toggle('active', open);
+        updateSidebarToggle();
+        return;
+      }
+      const isCollapsed = sidebar.classList.toggle('collapsed');
+      localStorage.setItem('bells-sidebar-collapsed', isCollapsed ? 'true' : 'false');
+      updateSidebarToggle();
+    }
+
+    function updateSidebarToggle() {
+      const btn = document.getElementById('sidebar-toggle');
+      const collapseBtn = document.getElementById('sidebar-collapse-btn');
+      const sidebar = document.getElementById('dashboard-col-left');
+      if (!sidebar) return;
+      const isMobile = window.innerWidth <= 768;
+      if (btn) {
+        const icon = btn.querySelector('i');
+        if (isMobile) {
+          const open = sidebar.classList.contains('mobile-open');
+          icon.className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+          btn.title = open ? 'Cerrar menú' : 'Abrir menú';
+        } else {
+          btn.title = 'Colapsar sidebar';
+        }
+        btn.setAttribute('aria-expanded', (isMobile ? sidebar.classList.contains('mobile-open') : !sidebar.classList.contains('collapsed')) ? 'true' : 'false');
+      }
+      if (collapseBtn) {
+        const collapsed = sidebar.classList.contains('collapsed');
+        collapseBtn.querySelector('i').className = collapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left';
+        collapseBtn.title = collapsed ? 'Expandir sidebar' : 'Colapsar sidebar';
+        collapseBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      }
+    }
+
+    window.setCalendarView = setCalendarView;
+    window.changeCalendarMonth = changeCalendarMonth;
+    window.renderCalendar = renderCalendar;
+    window.selectCalendarViewDate = selectCalendarViewDate;
+    window.openSelectedDayModal = openSelectedDayModal;
+    window.closeSelectedDayModal = closeSelectedDayModal;
+    window.closeSelectedDayModalOnBackdrop = closeSelectedDayModalOnBackdrop;
+    window.openAddEventModalFromDay = openAddEventModalFromDay;
+    window.toggleSidebar = toggleSidebar;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.getElementById('dashboard-col-left');
+      if (sidebar) {
+        sidebar.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+          const label = item.querySelector('span:last-child');
+          if (label) {
+            const text = label.textContent.trim();
+            item.setAttribute('aria-label', text);
+            item.setAttribute('data-tooltip', text);
+          }
+          if (item.classList.contains('active')) item.setAttribute('aria-current', 'page');
+        });
+        if (localStorage.getItem('bells-sidebar-collapsed') === 'true') {
+          sidebar.classList.add('collapsed');
+        }
+        sidebar.querySelectorAll('.sidebar-nav .nav-item').forEach(a => {
+          a.addEventListener('click', () => {
+            sidebar.classList.remove('collapsed');
+            localStorage.setItem('bells-sidebar-collapsed', 'false');
+            if (window.innerWidth <= 768) toggleSidebar(false);
+            updateSidebarToggle();
+          });
+        });
+      }
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && sidebar && sidebar.classList.contains('mobile-open')) toggleSidebar(false);
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && sidebar) {
+          sidebar.classList.remove('mobile-open');
+          const backdrop = document.getElementById('sidebar-backdrop');
+          if (backdrop) backdrop.classList.remove('active');
+        }
+        updateSidebarToggle();
+      });
+      updateSidebarToggle();
+      setCalendarView('month');
+    });
+    })();
+  </script>
+</body>
+</html>

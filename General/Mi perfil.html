@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BellsGroup CRM - Mi Perfil</title>
+  <meta name="description" content="Gestión y actualización de datos de perfil de usuario en BellsGroup.">
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Design System Compartido (Tokens + Base + Componentes) -->
+  <link rel="stylesheet" href="../bells.css">
+
+  <style>
+    /* Estilos específicos de Mi Perfil (layout 2 columnas, dinámica de marca por JS) */
+
+    body.dark-theme {
+      background-image: 
+          radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.08) 0, transparent 50%), 
+          radial-gradient(at 100% 0%, rgba(30, 41, 59, 0.3) 0, transparent 50%);
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-back:hover {
+      background: var(--bg-muted);
+      color: var(--primary);
+      transform: translateX(-2px);
+    }
+
+    /* Layout Central (Pantalla Completa - 2 Columnas) */
+    .layout-central {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 30px;
+      padding: 30px 40px;
+      flex: 1;
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .layout-central {
+        grid-template-columns: 1fr;
+        padding: 20px 16px;
+        gap: 20px;
+      }
+    }
+
+    /* Columna Izquierda: Tarjeta Lateral de Perfil */
+    .profile-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: sticky;
+      top: 100px;
+    }
+
+    @media (max-width: 900px) {
+      .profile-sidebar {
+        position: static;
+      }
+    }
+
+    .profile-info-card {
+      align-items: center;
+      text-align: center;
+      padding: 35px 24px;
+    }
+
+    .avatar-big-preview {
+      width: 96px;
+      height: 96px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 2px dashed var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .profile-card-header {
+      margin-bottom: 24px;
+    }
+
+    .profile-card-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .profile-card-role {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 4px;
+    }
+
+    .profile-meta-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 24px;
+      text-align: left;
+    }
+
+    .profile-meta-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .profile-meta-item i {
+      color: var(--primary);
+      font-size: 14px;
+      margin-top: 3px;
+      width: 16px;
+      text-align: center;
+    }
+
+    .meta-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .meta-value {
+      display: block;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    /* Columna Derecha: Contenido Principal de Ajustes */
+    .profile-main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .panel-header-section {
+      margin-bottom: 6px;
+    }
+
+    .panel-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title i {
+      color: var(--primary);
+    }
+
+    .panel-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Formulario y Tarjetas */
+    .profile-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .setting-card {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .setting-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 14px;
+    }
+
+    .setting-card-title i {
+      color: var(--primary);
+      font-size: 17px;
+    }
+
+    .config-grid-2col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .config-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .config-group label {
+      font-size: 13px;
+      font-weight: 550;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      outline: none;
+      transition: all 0.2s ease;
+      min-height: 44px;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+      background: var(--bg-card-solid);
+    }
+
+    .form-input:disabled,
+    .form-input[readonly] {
+      background: var(--bg-muted);
+      border-style: dashed;
+      color: var(--text-secondary);
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+
+    .form-input:disabled:focus,
+    .form-input[readonly]:focus {
+      box-shadow: none;
+      border-color: var(--border-color);
+    }
+
+    .input-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .input-wrapper-lock {
+      position: relative;
+    }
+
+    .input-wrapper-lock .lock-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Sincronización de cuentas */
+    .sync-accounts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sync-account-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+
+    .sync-account-item:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sync-account-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sync-brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .google-color {
+      background: #fdf2f2;
+      border: 1px solid #fbd5d5;
+      color: #ea4335;
+    }
+    body.dark-theme .google-color {
+      background: rgba(234, 67, 53, 0.1);
+      border-color: rgba(234, 67, 53, 0.2);
+    }
+
+    .apple-color {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      color: #111827;
+    }
+    body.dark-theme .apple-color {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .outlook-color {
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      color: #0078d4;
+    }
+    body.dark-theme .outlook-color {
+      background: rgba(0, 120, 212, 0.1);
+      border-color: rgba(0, 120, 212, 0.2);
+    }
+
+    .sync-account-name {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .sync-account-status {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .sync-account-status.connected {
+      color: var(--color-green-text);
+      font-weight: 600;
+    }
+
+    .btn-sync {
+      padding: 8px 16px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sync:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn-sync.connected {
+      background: var(--color-red-bg);
+      color: var(--color-red-text);
+      border-color: rgba(239, 68, 68, 0.15);
+    }
+
+    .btn-sync.connected:hover {
+      background: var(--color-red-bg);
+      color: var(--color-red-text);
+      border-color: var(--color-red);
+    }
+
+    /* Toggle Switch Styles */
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .switch-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1; /* Slate 300 */
+      transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 24px;
+    }
+
+    body.dark-theme .switch-slider {
+      background-color: #334155; /* Slate 700 */
+    }
+
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #ffffff;
+      transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
+
+    input:checked + .switch-slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .switch-slider:before {
+      transform: translateX(20px);
+    }
+
+    input:disabled + .switch-slider {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Botones de acción */
+    .actions-container {
+      display: flex;
+      justify-content: flex-end;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .btn-save {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-save:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-save:active {
+      transform: translateY(0);
+    }
+
+    /* Toast Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      background: var(--bg-card-solid);
+      border-left: 4px solid var(--color-green);
+      box-shadow: var(--shadow-premium);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateY(100px);
+      opacity: 0;
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-notification.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      color: var(--color-green);
+      font-size: 18px;
+    }
+
+    .toast-text {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="brand-section">
+      <button class="btn-back" onclick="goBack()">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver</span>
+      </button>
+      <div class="brand-icon">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <span class="brand-name">BellsGroup</span>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Reservado para notificaciones u otros elementos -->
+    </div>
+  </nav>
+
+  <!-- Layout Central (Grid Dos Columnas) -->
+  <main class="layout-central">
+    
+    <!-- Columna Izquierda: Tarjeta de Perfil -->
+    <aside class="profile-sidebar">
+      <div class="setting-card profile-info-card">
+        <div class="avatar-big-preview" id="profile-avatar-preview">-</div>
+        
+        <div class="profile-card-header">
+          <h2 class="profile-card-name" id="profile-card-name">-</h2>
+          <span class="profile-card-role" id="profile-card-role">-</span>
+        </div>
+        
+        <div class="profile-meta-list">
+          <div class="profile-meta-item">
+            <i class="fa-solid fa-envelope"></i>
+            <div>
+              <span class="meta-label">Email Principal</span>
+              <span class="meta-value" id="profile-card-email">-</span>
+            </div>
+          </div>
+          <div class="profile-meta-item">
+            <i class="fa-solid fa-circle-check c-green"></i>
+            <div>
+              <span class="meta-label">Estado de Cuenta</span>
+              <span class="meta-value c-green fw-600">Activa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Columna Derecha: Ajustes y Formulario -->
+    <section class="profile-main-content">
+      
+      <div class="panel-header-section">
+        <h1 class="panel-title">
+          <i class="fa-solid fa-circle-user"></i>
+          <span>Mi perfil</span>
+        </h1>
+        <p class="panel-subtitle">Administra tu información personal, tributaria y vinculaciones externas.</p>
+      </div>
+
+      <!-- Formulario -->
+      <form class="profile-form" onsubmit="saveProfile(event)">
+        
+        <!-- Tarjeta: Datos Personales -->
+        <div class="setting-card">
+          <div class="setting-card-title">
+            <i class="fa-solid fa-address-card"></i>
+            <span>Datos Personales</span>
+          </div>
+
+          <div class="config-grid-2col">
+            
+            <!-- Nombre Completo -->
+            <div class="config-group">
+              <label for="profile-name">
+                <i class="fa-solid fa-user"></i> Nombre Completo
+              </label>
+              <input type="text" id="profile-name" class="form-input" placeholder="Ej: Carlos Alarcón" required autocomplete="name">
+              <span class="input-desc">Nombre público en cotizaciones, reportes y CRM.</span>
+            </div>
+
+            <!-- Rol / Puesto -->
+            <div class="config-group">
+              <label for="profile-role">
+                <i class="fa-solid fa-briefcase"></i> Puesto / Rol Comercial
+              </label>
+              <select id="profile-role" class="form-input" required>
+                <option value="Asesor">Asesor Comercial</option>
+                <option value="Senior Advisor">Asesor Comercial Senior</option>
+                <option value="Team Leader">Team Leader</option>
+              </select>
+              <span class="input-desc">Nivel jerárquico y de permisos en la plataforma.</span>
+            </div>
+
+            <!-- Correo Electrónico (BLOQUEADO) -->
+            <div class="config-group">
+              <label for="profile-email">
+                <i class="fa-solid fa-envelope"></i> Correo Electrónico
+              </label>
+              <div class="input-wrapper-lock">
+                <input type="email" id="profile-email" class="form-input" readonly autocomplete="username" tabindex="-1">
+                <i class="fa-solid fa-lock lock-icon" title="No modificable"></i>
+              </div>
+              <span class="input-desc c-red">Tu correo es tu identidad y no puede modificarse de forma directa.</span>
+            </div>
+
+            <!-- Número de Teléfono -->
+            <div class="config-group">
+              <label for="profile-phone">
+                <i class="fa-solid fa-phone"></i> Número de Teléfono
+              </label>
+              <input type="tel" id="profile-phone" class="form-input" placeholder="Ej: +54 9 11 3445-6677" required autocomplete="tel">
+              <span class="input-desc">Formato internacional para integraciones de mensajería comercial.</span>
+            </div>
+
+            <!-- CUIL / CUIT -->
+            <div class="config-group">
+              <label for="profile-cuit">
+                <i class="fa-solid fa-hashtag"></i> CUIL / CUIT
+              </label>
+              <input type="text" id="profile-cuit" class="form-input" placeholder="Ej: 20-30456789-2" required>
+              <span class="input-desc">Identificación tributaria oficial.</span>
+            </div>
+
+            <!-- Tipo de Documento -->
+            <div class="config-group">
+              <label for="profile-doc-type">
+                <i class="fa-solid fa-id-card"></i> Tipo de Documento
+              </label>
+              <select id="profile-doc-type" class="form-input" required>
+                <option value="DNI">DNI (Documento Nacional)</option>
+                <option value="Pasaporte">Pasaporte</option>
+                <option value="CUIT">CUIT</option>
+                <option value="CUIL">CUIL</option>
+              </select>
+            </div>
+
+            <!-- Número de Documento -->
+            <div class="config-group">
+              <label for="profile-doc-number">
+                <i class="fa-solid fa-hashtag"></i> Número de Documento
+              </label>
+              <input type="text" id="profile-doc-number" class="form-input" placeholder="Ej: 38.223.114" required>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tarjeta: Sincronización de Cuentas -->
+        <div class="setting-card">
+          <div class="setting-card-title">
+            <i class="fa-solid fa-arrows-spin"></i>
+            <span>Sincronización de Cuentas</span>
+          </div>
+          <p class="input-desc" style="margin-top: -10px;">Vincula tus cuentas externas para sincronizar tus correos, contactos y el calendario comercial.</p>
+
+          <div class="sync-accounts-list">
+            <!-- Google -->
+            <div class="sync-account-item">
+              <div class="sync-account-info">
+                <div class="sync-brand-icon google-color">
+                  <i class="fa-brands fa-google"></i>
+                </div>
+                <div>
+                  <span class="sync-account-name">Google Calendar & Gmail</span>
+                  <span class="sync-account-status" id="sync-status-google">No sincronizado</span>
+                </div>
+              </div>
+              <label class="switch-toggle">
+                <input type="checkbox" id="sync-checkbox-google" onchange="toggleSync('google')">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- Apple -->
+            <div class="sync-account-item">
+              <div class="sync-account-info">
+                <div class="sync-brand-icon apple-color">
+                  <i class="fa-brands fa-apple"></i>
+                </div>
+                <div>
+                  <span class="sync-account-name">Apple iCloud</span>
+                  <span class="sync-account-status" id="sync-status-apple">No sincronizado</span>
+                </div>
+              </div>
+              <label class="switch-toggle">
+                <input type="checkbox" id="sync-checkbox-apple" onchange="toggleSync('apple')">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- Outlook -->
+            <div class="sync-account-item">
+              <div class="sync-account-info">
+                <div class="sync-brand-icon outlook-color">
+                  <i class="fa-brands fa-microsoft"></i>
+                </div>
+                <div>
+                  <span class="sync-account-name">Microsoft</span>
+                  <span class="sync-account-status" id="sync-status-outlook">No sincronizado</span>
+                </div>
+              </div>
+              <label class="switch-toggle">
+                <input type="checkbox" id="sync-checkbox-outlook" onchange="toggleSync('outlook')">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="actions-container">
+          <button type="submit" class="btn-save" id="btn-submit">
+            <i class="fa-solid fa-floppy-disk" id="submit-icon"></i>
+            <span id="submit-text">Guardar Cambios</span>
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification System -->
+  <div class="toast-notification" id="toast-el">
+    <i class="fa-solid fa-circle-check toast-icon"></i>
+    <span class="toast-text" id="toast-text-el">¡Perfil actualizado con éxito!</span>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      initThemeAndAccent();
+      loadProfileData();
+      loadSyncStatus();
+      
+      // Escuchar cambios en los inputs para actualizar la vista previa de la tarjeta lateral en vivo
+      const nameInput = document.getElementById('profile-name');
+      nameInput.addEventListener('input', () => {
+        const val = nameInput.value.trim() || 'Usuario';
+        updateAvatarPreview(nameInput.value);
+        document.getElementById('profile-card-name').textContent = val;
+      });
+
+      const roleSelect = document.getElementById('profile-role');
+      roleSelect.addEventListener('change', () => {
+        const val = roleSelect.value;
+        const roleLabel = val === 'Team Leader' ? 'Team Leader / PASS' : (val === 'Senior Advisor' ? 'Asesor Comercial Senior' : 'Asesor Comercial');
+        document.getElementById('profile-card-role').textContent = roleLabel;
+      });
+    });
+
+    /**
+     * Carga el tema claro/oscuro y el color de acento personalizado desde localStorage
+     */
+    function initThemeAndAccent() {
+      // Tema claro/oscuro
+      const savedTheme = localStorage.getItem('bells-theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+      } else {
+        document.body.classList.remove('dark-theme');
+      }
+
+      // Color primario de acento
+      const savedColor = localStorage.getItem('bells-primary-color') || '#7c3aed';
+      document.documentElement.style.setProperty('--primary', savedColor);
+      
+      // Ajustar hover e intensidades leves basadas en el color
+      if (savedColor !== '#7c3aed') {
+        document.documentElement.style.setProperty('--primary-hover', adjustColorBrightness(savedColor, -15));
+        document.documentElement.style.setProperty('--primary-light', `${savedColor}1e`); // Transparencia en hex
+      }
+    }
+
+    /**
+     * Carga los datos de perfil desde localStorage
+     */
+    function loadProfileData() {
+      // Extraemos los datos o ponemos valores por defecto
+      const name = localStorage.getItem('bells_user_name') || 'Carlos';
+      const role = localStorage.getItem('bells_user_role') || 'Asesor';
+      const email = localStorage.getItem('bells_user_email') || 'carlos.a@bellsgroup.com';
+      const phone = localStorage.getItem('bells_user_phone') || '+54 9 11 3445-6677';
+      const cuit = localStorage.getItem('bells_user_cuit') || '20-38223114-5';
+      const docType = localStorage.getItem('bells_user_doc_type') || 'DNI';
+      const docNum = localStorage.getItem('bells_user_doc_num') || '38.223.114';
+
+      // Rellenamos el formulario
+      document.getElementById('profile-name').value = name;
+      document.getElementById('profile-role').value = role;
+      document.getElementById('profile-email').value = email; // Solo lectura
+      document.getElementById('profile-phone').value = phone;
+      document.getElementById('profile-cuit').value = cuit;
+      document.getElementById('profile-doc-type').value = docType;
+      document.getElementById('profile-doc-number').value = docNum;
+
+      // Sincronizar tarjeta lateral
+      document.getElementById('profile-card-name').textContent = name;
+      document.getElementById('profile-card-role').textContent = role === 'Team Leader' ? 'Team Leader / PASS' : (role === 'Senior Advisor' ? 'Asesor Comercial Senior' : 'Asesor Comercial');
+      document.getElementById('profile-card-email').textContent = email;
+
+      // Inicializar vista previa de avatar
+      updateAvatarPreview(name);
+    }
+
+    /**
+     * Actualiza el círculo con las iniciales del nombre
+     */
+    function updateAvatarPreview(fullName) {
+      const previewEl = document.getElementById('profile-avatar-preview');
+      if (!fullName || fullName.trim() === '') {
+        previewEl.textContent = '-';
+        return;
+      }
+      
+      const parts = fullName.trim().split(/\s+/);
+      let initials = '';
+      if (parts.length > 0 && parts[0]) initials += parts[0].charAt(0).toUpperCase();
+      if (parts.length > 1 && parts[1]) initials += parts[1].charAt(0).toUpperCase();
+      
+      previewEl.textContent = initials || fullName.charAt(0).toUpperCase();
+    }
+
+    /**
+     * Guarda los datos en localStorage y muestra la animación de éxito
+     */
+    function saveProfile(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('profile-name').value.trim();
+      const role = document.getElementById('profile-role').value;
+      const phone = document.getElementById('profile-phone').value.trim();
+      const cuit = document.getElementById('profile-cuit').value.trim();
+      const docType = document.getElementById('profile-doc-type').value;
+      const docNum = document.getElementById('profile-doc-number').value.trim();
+
+      // Guardar en localStorage
+      localStorage.setItem('bells_user_name', name);
+      localStorage.setItem('bells_user_role', role);
+      localStorage.setItem('bells_user_phone', phone);
+      localStorage.setItem('bells_user_cuit', cuit);
+      localStorage.setItem('bells_user_doc_type', docType);
+      localStorage.setItem('bells_user_doc_num', docNum);
+
+      // Sincronizar tarjeta lateral
+      document.getElementById('profile-card-name').textContent = name;
+      document.getElementById('profile-card-role').textContent = role === 'Team Leader' ? 'Team Leader / PASS' : (role === 'Senior Advisor' ? 'Asesor Comercial Senior' : 'Asesor Comercial');
+
+      // Mostrar feedback en botón
+      const btnSubmit = document.getElementById('btn-submit');
+      const submitIcon = document.getElementById('submit-icon');
+      const submitText = document.getElementById('submit-text');
+
+      btnSubmit.disabled = true;
+      submitIcon.className = 'fa-solid fa-circle-notch fa-spin';
+      submitText.textContent = 'Guardando...';
+
+      setTimeout(() => {
+        // Estado Exitoso
+        submitIcon.className = 'fa-solid fa-check';
+        submitText.textContent = '¡Guardado!';
+        btnSubmit.style.backgroundColor = 'var(--color-green)';
+        
+        showToast('¡Datos del perfil actualizados con éxito!');
+
+        setTimeout(() => {
+          // Reestablecer botón
+          btnSubmit.disabled = false;
+          btnSubmit.style.backgroundColor = '';
+          submitIcon.className = 'fa-solid fa-floppy-disk';
+          submitText.textContent = 'Guardar Cambios';
+        }, 1500);
+
+      }, 1000);
+    }
+
+    /**
+     * Carga el estado de sincronización de cuentas de terceros
+     */
+    function loadSyncStatus() {
+      const providers = ['google', 'apple', 'outlook'];
+      providers.forEach(provider => {
+        const isConnected = localStorage.getItem(`bells_sync_${provider}`) === 'true';
+        const statusEl = document.getElementById(`sync-status-${provider}`);
+        const checkbox = document.getElementById(`sync-checkbox-${provider}`);
+        
+        if (isConnected) {
+          checkbox.checked = true;
+          statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sincronizado';
+          statusEl.classList.add('connected');
+        } else {
+          checkbox.checked = false;
+          statusEl.textContent = 'No sincronizado';
+          statusEl.classList.remove('connected');
+        }
+      });
+    }
+
+    /**
+     * Alterna la vinculación de cuentas de terceros con simulación y guardado en localStorage
+     */
+    function toggleSync(provider) {
+      const checkbox = document.getElementById(`sync-checkbox-${provider}`);
+      const statusEl = document.getElementById(`sync-status-${provider}`);
+      const isChecking = checkbox.checked;
+
+      // Desactivamos temporalmente el checkbox para simular la carga
+      checkbox.disabled = true;
+
+      if (isChecking) {
+        // Conectar (Simulación)
+        statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin c-primary"></i> Vinculando...';
+        
+        setTimeout(() => {
+          localStorage.setItem(`bells_sync_${provider}`, 'true');
+          checkbox.disabled = false;
+          checkbox.checked = true;
+          
+          statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sincronizado';
+          statusEl.classList.add('connected');
+          
+          showToast(`¡Cuenta de ${provider.charAt(0).toUpperCase() + provider.slice(1)} vinculada con éxito!`);
+        }, 1200);
+      } else {
+        // Desconectar
+        statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Desvinculando...';
+        
+        setTimeout(() => {
+          localStorage.setItem(`bells_sync_${provider}`, 'false');
+          checkbox.disabled = false;
+          checkbox.checked = false;
+          
+          statusEl.textContent = 'No sincronizado';
+          statusEl.classList.remove('connected');
+          
+          showToast(`Se ha desvinculado la cuenta de ${provider.charAt(0).toUpperCase() + provider.slice(1)}.`);
+        }, 800);
+      }
+    }
+
+    /**
+     * Redirige al dashboard correspondiente según el rol
+     */
+    function goBack() {
+      const role = localStorage.getItem('bells_user_role') || 'Asesor';
+      if (role === 'Team Leader') {
+        window.location.href = '../Backoffice/Dashboard general.html';
+      } else {
+        window.location.href = '../Vendedor/dashboard.html';
+      }
+    }
+
+    /**
+     * Muestra una notificación emergente tipo toast
+     */
+    function showToast(message) {
+      const toast = document.getElementById('toast-el');
+      const toastText = document.getElementById('toast-text-el');
+      
+      toastText.textContent = message;
+      toast.classList.add('active');
+
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3000);
+    }
+
+    /**
+     * Utilidad para ajustar el brillo de un color hexadecimal
+     */
+    function adjustColorBrightness(hex, percent) {
+      let num = parseInt(hex.replace("#",""), 16),
+      amt = Math.round(2.55 * percent),
+      R = (num >> 16) + amt,
+      G = (num >> 8 & 0x00FF) + amt,
+      B = (num & 0x0000FF) + amt;
+      return "#" + (0x1000000 + (R<255?R<0?0:R:255)*0x10000 + (G<255?G<0?0:G:255)*0x100 + (B<255?B<0?0:B:255)).toString(16).slice(1);
+    }
+  </script>
+</body>
+</html>

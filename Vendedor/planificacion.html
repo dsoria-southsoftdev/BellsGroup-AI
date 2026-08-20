@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BellsGroup CRM - Planificación Comercial</title>
+  <meta name="description" content="Hoja de planificación comercial de BellsGroup. Planificación anual, mensual, semanal y rango de fechas para campañas e incrementos a clientes.">
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Design System Compartido (Tokens + Base + Componentes) -->
+  <link rel="stylesheet" href="../bells.css">
+  
+  <!-- Google Fonts: Roboto & Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <style>/* Layout Principal */
+    .layout-planning {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 20px;
+      padding: 20px;
+      flex: 1;
+      max-width: 100%;
+      width: 100%;
+    }
+
+    /* Panels/Cards Base */
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Control Center (Filtros superiores) */
+    .planning-header-card {
+      grid-column: span 2;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 243, 255, 0.95) 100%);
+      border: 1px solid rgba(124, 58, 237, 0.2);
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .planning-tabs {
+      display: flex;
+      background: var(--bg-muted);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .planning-tab-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .planning-tab-btn.active {
+      background: var(--bg-card-solid);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .date-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 6px 12px;
+    }
+
+    .date-input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: var(--text-primary);
+      background: transparent;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .campaign-filter-select {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .campaign-filter-select:focus {
+      border-color: var(--primary);
+    }
+
+    /* Barra de progreso de campañas */
+    .progress-bar-container {
+      background: var(--bg-muted);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+      width: 100%;
+    }
+    .progress-bar {
+      background: var(--primary);
+      border-radius: var(--radius-pill);
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    .progress-bar.green {
+      background: var(--color-green);
+    }
+
+    /* Main Area */
+    .planning-main {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .planning-main.weekly-mode {
+      grid-template-columns: 1fr;
+    }
+
+    @media (max-width: 1200px) {
+      .planning-main, .planning-main.weekly-mode {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Calendario Semanal */
+    .weekly-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      min-height: 280px;
+    }
+
+    .calendar-day-col {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .calendar-day-header {
+      padding: 10px 8px;
+      background: var(--bg-muted);
+      border-bottom: 1px solid var(--border-color);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .calendar-day-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .calendar-day-date {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .calendar-day-col.today {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.1);
+    }
+
+    .calendar-day-col.today .calendar-day-header {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .calendar-day-col.today .calendar-day-date {
+      color: var(--primary);
+    }
+
+    .calendar-events-container {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .calendar-event-card {
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.3;
+      border-left: 3px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: var(--bg-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .calendar-event-card:hover {
+      transform: scale(1.02);
+      filter: brightness(0.98);
+    }
+
+    .calendar-event-card.call { border-left-color: var(--primary); background: var(--primary-light); color: var(--primary-hover); }
+    .calendar-event-card.meeting { border-left-color: var(--color-blue); background: var(--color-blue-bg); color: var(--color-blue-text); }
+    .calendar-event-card.increase { border-left-color: var(--color-yellow); background: var(--color-yellow-bg); color: var(--color-yellow-text); }
+
+    .calendar-event-time {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Vista de Historial / Cronograma */
+    .timeline-view-container {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .timeline-item:hover .timeline-content {
+      border-color: var(--primary);
+      transform: translateX(6px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: 36px;
+      bottom: -16px;
+      width: 1px;
+      background: var(--border-color);
+    }
+
+    .timeline-item:last-child::before {
+      display: none;
+    }
+
+    .timeline-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-avatar.call { background: var(--primary-light); color: var(--primary); }
+    .timeline-avatar.meeting { background: var(--color-blue-bg); color: var(--color-blue-text); }
+    .timeline-avatar.increase { background: var(--color-yellow-bg); color: var(--color-yellow-text); }
+
+    .timeline-content {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .timeline-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .timeline-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .timeline-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Listado de Incrementos a Clientes */
+    .increases-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .weekly-mode .increases-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+      .weekly-mode .increases-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .increase-card {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      transition: all 0.25s;
+    }
+
+    .increase-card:hover {
+      border-color: var(--color-yellow);
+      box-shadow: var(--shadow-md);
+    }
+
+    .increase-card.applied {
+      opacity: 0.6;
+      border-color: var(--color-green);
+    }
+
+    .increase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .increase-client-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .increase-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      text-transform: uppercase;
+    }
+
+    .increase-badge.ipc { background: var(--color-yellow-bg); color: var(--color-yellow-text); }
+    .increase-badge.upgrade { background: var(--primary-light); color: var(--primary); }
+
+    .increase-details {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .increase-date-tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .increase-actions {
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: var(--radius-pill);
+    }
+
+    /* Modal Backdrop / Modal (Igual a dashboard.html) */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 480px;
+      box-shadow: var(--shadow-premium);
+      transform: scale(0.95);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-backdrop.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      background: var(--bg-muted);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      font-size: 18px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+      background: rgba(226, 232, 240, 0.8);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-group input, .form-group select {
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      outline: none;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      background: white;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .btn-secondary {
+      background: var(--bg-muted);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      color: var(--text-primary);
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+    }
+
+    .panel-action-link {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+
+    .panel-action-link:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+
+    /* Toast Container */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .toast {
+      background: #1e293b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      transform: translateY(100px);
+      opacity: 0;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      border-left: 4px solid var(--primary);
+    }
+
+    @keyframes slideIn {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .toast.success { border-left-color: var(--color-green); }
+    .toast.info { border-left-color: var(--color-blue); }
+
+    /* Responsivo */
+    @media (max-width: 1024px) {
+      .layout-planning {
+        grid-template-columns: 1fr;
+      }
+      .planning-header-card {
+        grid-column: span 1;
+      }
+      .increases-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Backdrop móvil: cierra drawer al tocar fuera -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+    <!-- Left Sidebar (Redesigned Material 3 Navigation Drawer) -->
+    <aside class="sidebar-left" id="dashboard-col-left">
+    <script>if (localStorage.getItem('bells-sidebar-collapsed') === 'true') { document.getElementById('dashboard-col-left').classList.add('collapsed'); }</script>
+      <!-- Branding -->
+      <div class="sidebar-branding">
+        <div class="brand-icon">
+          <span class="material-symbols-outlined">notifications_active</span>
+        </div>
+        <span class="brand-name">BellsGroup</span>
+      </div>
+
+      <!-- Navigation Groups -->
+      <nav class="sidebar-nav">
+        <span class="nav-label">General</span>
+        <a href="dashboard.html" class="nav-item">
+          <span class="material-symbols-outlined">dashboard</span> <span>Dashboard</span>
+        </a>
+        <a href="Clientes.html" class="nav-item">
+          <span class="material-symbols-outlined">group</span> <span>Clientes</span>
+        </a>
+        <a href="Embudo.html" class="nav-item">
+          <span class="material-symbols-outlined">filter_alt</span> <span>Embudo de ventas</span>
+        </a>
+        
+        <a href="Comisiones.html" class="nav-item">
+          <span class="material-symbols-outlined">payments</span> <span>Comisiones</span>
+        </a>
+        <span class="nav-label" style="margin-top: 12px;">Herramientas</span>
+        <a href="dashboard.html#prospect" class="nav-item">
+          <span class="material-symbols-outlined">person_add</span> <span>Registrar Prospecto</span>
+        </a>
+        <a href="dashboard.html#simulations" class="nav-item">
+          <span class="material-symbols-outlined">calculate</span> <span>Simulaciones</span>
+        </a>
+        <a href="dashboard.html#report" class="nav-item">
+          <span class="material-symbols-outlined">download</span> <span>Reportes</span>
+        </a>
+        <a href="Configuracion-vendedor.html" class="nav-item">
+          <span class="material-symbols-outlined">settings</span> <span>Configuración</span>
+        </a>
+        <a href="dashboard.html#history" class="nav-item">
+          <span class="material-symbols-outlined">history</span> <span>Historial Reciente</span>
+        </a>
+      </nav>
+
+      <!-- Toggle colapso (chevron) -->
+      <button id="sidebar-collapse-btn" class="sidebar-collapse-btn" onclick="toggleSidebar()" title="Colapsar sidebar" aria-controls="dashboard-col-left" aria-expanded="true">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <header class="top-header">
+        <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Colapsar sidebar" aria-controls="dashboard-col-left" aria-expanded="true" style="margin-right: auto;">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="zurich-status" id="sync-container" onclick="triggerManualSync()" title="Hacer clic para sincronizar manualmente">
+          <div class="sync-dot"></div>
+          <span id="sync-time-text">Zurich Sync: OK (12 min)</span>
+        </div>
+
+        <div class="user-profile">
+          <a href="../General/Mi perfil.html" class="d-flex items-center gap-10 c-inherit td-none">
+            <div class="user-avatar" id="user-avatar">C</div>
+            <div class="user-info">
+              <span class="user-name" id="user-display-name">Carlos</span>
+              <span class="user-role" id="user-display-role">Asesor Comercial</span>
+            </div>
+          </a>
+          <button class="logout-btn" onclick="logout()" title="Cerrar sesión">
+            <i class="fa-solid fa-power-off"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Planning Layout -->
+      <main class="layout-planning">
+    
+    <!-- Control Center Card (Filtros en el encabezado de planificación) -->
+    <div class="panel planning-header-card">
+      <div class="control-group" style="width: 100%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <div class="planning-tabs">
+            <button class="planning-tab-btn" onclick="changeView('semana')">Semana</button>
+            <button class="planning-tab-btn active" onclick="changeView('mes')">Mes</button>
+            <button class="planning-tab-btn" onclick="changeView('anio')">Año</button>
+            <button class="planning-tab-btn" onclick="changeView('custom')">Personalizado</button>
+          </div>
+          
+          <div class="period-navigation" id="period-nav-container" style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px;">
+            <button type="button" class="btn-nav" onclick="navigatePeriod(-1)" style="background: var(--bg-card-solid); border: 1px solid var(--border-color); border-radius: var(--radius-sm); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); transition: all 0.2s;"><i class="fa-solid fa-chevron-left"></i></button>
+            <span id="current-period-display" style="min-width: 140px; text-align: center; font-family:'Plus Jakarta Sans'; font-size: 14px; color: var(--text-primary);">Julio 2026</span>
+            <button type="button" class="btn-nav" onclick="navigatePeriod(1)" style="background: var(--bg-card-solid); border: 1px solid var(--border-color); border-radius: var(--radius-sm); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); transition: all 0.2s;"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+
+          <div class="date-picker-wrapper d-none" id="custom-date-range-picker">
+            <input type="date" id="plan-start-date" class="date-input" onchange="handleDateRangeChange()">
+            <span style="color: var(--text-muted); font-size: 13px;">a</span>
+            <input type="date" id="plan-end-date" class="date-input" onchange="handleDateRangeChange()">
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary" onclick="openCreateEventModal()" style="padding: 10px 16px; font-size: 13px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-calendar-plus"></i>
+          <span>Agendar Actividad</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- CENTER SECTION: Calendario & Incrementos -->
+    <section class="planning-main">
+      
+      <!-- Visualizador Semanal / Cronograma -->
+      <div class="panel">
+        <div class="panel-title" id="temporal-view-title">
+          <span>Cronograma del Período</span>
+          <i class="fa-solid fa-calendar-week"></i>
+        </div>
+        
+        <!-- Vista Semanal (Por defecto oculta, se activa al seleccionar "Semana") -->
+        <div class="weekly-calendar-grid d-none" id="weekly-calendar-grid">
+          <!-- Generado dinámicamente de lunes a domingo -->
+        </div>
+
+        <!-- Vista Mensual/Anual/Personalizado (Vista Timeline) -->
+        <div class="timeline-view-container d-flex" id="timeline-view-container">
+          <!-- Cargado dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Incrementos programados en el rango -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>Incrementos de Pólizas Programados</span>
+          <i class="fa-solid fa-trend-up" style="color: var(--color-yellow);"></i>
+        </div>
+        <div class="increases-list" id="increases-list-container">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+
+    </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER FOR NOTIFICATIONS -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- CAMPAIGN DETAILS MODAL -->
+  <div class="modal-backdrop" id="campaign-details-modal" onclick="closeCampaignDetailsModalOnBackdrop(event)">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header bg-primary-gradient">
+        <h3 class="modal-title d-flex items-center gap-8" id="campaign-details-title">
+          <i class="fa-solid fa-bullseye c-primary"></i>
+          <span>Detalles de la Campaña</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeCampaignDetailsModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="campaign-details-body">
+        <!-- Cargado dinámicamente -->
+      </div>
+      <div class="modal-footer" id="campaign-details-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+        <!-- Acciones dinámicas -->
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="create-campaign-modal" onclick="closeCreateCampaignModalOnBackdrop(event)">
+    <div class="modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title d-flex items-center gap-8">
+          <i class="fa-solid fa-circle-plus c-primary"></i>
+          <span id="create-campaign-modal-title">Crear Nueva Campaña</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeCreateCampaignModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: flex-end;">
+          <div>
+            <label for="new-campaign-name">Nombre de la Campaña</label>
+            <input type="text" id="new-campaign-name" placeholder="Ej. Campaña Zurich Vida Q4" required class="w-100">
+          </div>
+          <div>
+            <label for="new-campaign-type">Tipo de Campaña</label>
+            <select id="new-campaign-type" class="w-100" onchange="handleCampaignTypeChange()">
+              <option value="personal">Incentivo Personal (Auto-promesa)</option>
+              <option value="internal">Interna BellsGroup</option>
+              <option value="zurich">Zurich</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="new-campaign-reward" id="campaign-reward-label">Premio / Incentivo Auto-promesa</label>
+          <input type="text" id="new-campaign-reward" placeholder="Ej. Cena premium / Bono de comisión" required class="w-100">
+        </div>
+        <div class="form-group d-grid gap-12">
+          <div>
+            <label for="new-campaign-goal">Meta (Ventas / Pólizas)</label>
+            <input type="number" id="new-campaign-goal" value="10" min="1" required class="w-100">
+          </div>
+          <div>
+            <label for="new-campaign-icon">Icono Representativo</label>
+            <select id="new-campaign-icon" class="w-100">
+              <option value="fa-gift">Regalo</option>
+              <option value="fa-plane">Viaje</option>
+              <option value="fa-coins">Monedas / Bono</option>
+              <option value="fa-laptop">Tecnología</option>
+              <option value="fa-award">Medalla</option>
+              <option value="fa-car">Automotor</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group d-grid gap-12">
+          <div>
+            <label for="new-campaign-start">Fecha de Inicio</label>
+            <input type="date" id="new-campaign-start" required class="w-100">
+          </div>
+          <div>
+            <label for="new-campaign-end">Fecha de Fin</label>
+            <input type="date" id="new-campaign-end" required class="w-100">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeCreateCampaignModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="submitPersonalCampaign()">Crear Campaña</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENT DETAILS MODAL -->
+  <div class="modal-backdrop" id="event-details-modal" onclick="closeEventDetailsModalOnBackdrop(event)">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header bg-primary-gradient">
+        <h3 class="modal-title d-flex items-center gap-8" id="event-detail-title">
+          <!-- Loaded dynamically -->
+        </h3>
+        <button type="button" class="modal-close" onclick="closeEventDetailsModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="event-detail-body">
+        <!-- Loaded dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeEventDetailsModal()">Cerrar</button>
+      </div>
+    </div>
+  <!-- CREATE EVENT MODAL -->
+  <div class="modal-backdrop" id="create-event-modal" onclick="closeCreateEventModalOnBackdrop(event)">
+    <div class="modal mw-450">
+      <div class="modal-header">
+        <h3 class="modal-title d-flex items-center gap-8">
+          <i class="fa-solid fa-calendar-plus c-primary"></i>
+          <span>Agendar Actividad</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="closeCreateEventModal()">&times;</button>
+      </div>
+      <form id="create-event-form" onsubmit="saveCreateEvent(event)" style="display: flex; flex-direction: column; gap: 12px; padding: 20px;">
+        <div class="form-group d-flex-col gap-6">
+          <label class="form-label c-secondary fs-11 fw-700 text-uppercase">Tipo de Actividad</label>
+          <select id="new-event-type" class="radius-sm border-default fs-13 outline-none px-12 py-8 w-100" required>
+            <option value="call">Llamada Comercial</option>
+            <option value="meeting">Reunión / Cierre</option>
+            <option value="increase">Incremento / Ajuste</option>
+          </select>
+        </div>
+        <div class="form-group d-flex-col gap-6">
+          <label class="form-label c-secondary fs-11 fw-700 text-uppercase">Título de Actividad</label>
+          <input type="text" id="new-event-title" placeholder="Ej. Llamar a Juan Pérez" class="radius-sm border-default fs-13 outline-none px-12 py-8 w-100" required>
+        </div>
+        <div class="form-group d-flex-col gap-6">
+          <label class="form-label c-secondary fs-11 fw-700 text-uppercase">Detalle / Nota</label>
+          <textarea id="new-event-detail" placeholder="Ej. Presentar cotización Zurich..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; outline: none; resize: vertical; min-height: 60px;" required></textarea>
+        </div>
+        <div class="form-grid d-grid gap-12">
+          <div class="form-group d-flex-col gap-6">
+            <label class="form-label c-secondary fs-11 fw-700 text-uppercase">Fecha</label>
+            <input type="date" id="new-event-date" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px;" required>
+          </div>
+          <div class="form-group d-flex-col gap-6">
+            <label class="form-label c-secondary fs-11 fw-700 text-uppercase">Hora</label>
+            <input type="time" id="new-event-time" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px;" required>
+          </div>
+        </div>
+        <div class="form-group d-flex-col gap-6">
+          <label class="form-label c-secondary fs-11 fw-700 text-uppercase">Campaña Asociada</label>
+          <select id="new-event-campaign" class="radius-sm border-default fs-13 outline-none px-12 py-8 w-100">
+            <option value="zurich-vida">Campaña Zurich Vida</option>
+            <option value="bells-auto">Incentivo Interno Auto</option>
+            <option value="salud-pro">Campaña Salud Pro</option>
+            <option value="meta-tri">Tu Meta Trimestral</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px;">
+          <button type="button" class="btn btn-secondary" onclick="closeCreateEventModal()" style="padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary);">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; background: var(--primary); color: white; border: none;">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Helpers to manage dates in local time without timezone shifts
+    function formatLocalDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseLocalDate(dateStr) {
+      const parts = dateStr.split('-');
+      return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    }
+
+    let currentViewMode = 'mes'; // semana, mes, anio, custom
+    let activeCampaignIdFilter = 'todas';
+
+    // Rango de fechas activo
+    let activeStartDate = null;
+    let activeEndDate = null;
+
+    // Datos Mock de Eventos Planificados
+    let planEvents = [
+      { id: 1, type: 'call', title: 'Llamar a Tomás Restrepo', detail: 'Seguimiento por Plan Retiro FAP', date: '2026-07-28', time: '10:30', campaignId: 'zurich-vida' },
+      { id: 2, type: 'meeting', title: 'Reunión Dr. Claudio Sola', detail: 'Firma de póliza Zurich Vida Colectivo Q3', date: '2026-07-28', time: '16:00', campaignId: 'zurich-vida' },
+      { id: 3, type: 'meeting', title: 'Revisión con Team Leader', detail: 'Ajuste de comisiones y proyección Auto Q3', date: '2026-07-29', time: '11:00', campaignId: 'bells-auto' },
+      { id: 4, type: 'call', title: 'Seguimiento María Gómez', detail: 'Coordinar envío de documentación pendiente', date: '2026-07-30', time: '09:15', campaignId: 'meta-tri' },
+      { id: 5, type: 'call', title: 'Contacto Salud Pro', detail: 'Enviar propuesta a Carlos A.', date: '2026-07-31', time: '14:30', campaignId: 'salud-pro' },
+      { id: 6, type: 'increase', title: 'Aplicar incremento Claudio Sola', detail: 'Ajuste anual IPC (+15% prima)', date: '2026-07-28', time: '08:00', campaignId: 'meta-tri' },
+      { id: 7, type: 'increase', title: 'Aviso Ajuste Tomás Restrepo', detail: 'Incremento preventivo edad (+10% prima)', date: '2026-07-30', time: '08:00', campaignId: 'zurich-vida' },
+      { id: 8, type: 'increase', title: 'Upgrade María Gómez', detail: 'Renovación y Upgrade Plan Platinum (+$200 USD)', date: '2026-08-10', time: '08:00', campaignId: 'meta-tri' },
+      { id: 9, type: 'meeting', title: 'Cierre Mensual Colectivos', detail: 'Entrega final de pólizas Zurich Q3', date: '2026-08-31', time: '17:00', campaignId: 'zurich-vida' },
+      { id: 10, type: 'meeting', title: 'Cierre Julio Martínez', detail: 'Firma y asesoramiento de póliza Retiro Integral', date: '2026-07-27', time: '12:00', campaignId: 'bells-auto' },
+      { id: 11, type: 'call', title: 'Llamar a Lucía Fernández', detail: 'Consultar dudas sobre cotización de Seguro Automotor', date: '2026-07-27', time: '15:30', campaignId: 'bells-auto' },
+      { id: 12, type: 'increase', title: 'Aviso Ajuste Carlos A.', detail: 'Readecuación cuota de póliza Salud Pro (+12.5% prima)', date: '2026-07-29', time: '08:00', campaignId: 'salud-pro' },
+      { id: 13, type: 'meeting', title: 'Networking Zurich', detail: 'Presentación de nuevos productos corporativos Zurich Vida', date: '2026-08-05', time: '09:00', campaignId: 'zurich-vida' },
+      { id: 14, type: 'call', title: 'Llamada Fidelización Claudio Sola', detail: 'Validación de recepción de póliza física y bienvenida', date: '2026-08-12', time: '10:00', campaignId: 'meta-tri' },
+      { id: 15, type: 'meeting', title: 'Planificación Comercial Bells', detail: 'Alineación de objetivos Q3 y comisiones estimadas', date: '2026-08-20', time: '15:00', campaignId: 'bells-auto' }
+    ];
+
+    // Datos Mock de Incrementos Programados a Clientes
+    let clientIncrements = [
+      { id: 'inc-1', clientName: 'Claudio Sola', currentPremium: 1200, increasePercent: 15, increaseAmount: 180, date: '2026-07-28', type: 'ipc', reason: 'Ajuste anual por inflación IPC', applied: false, campaignId: 'meta-tri' },
+      { id: 'inc-2', clientName: 'Tomás Restrepo', currentPremium: 2500, increasePercent: 10, increaseAmount: 250, date: '2026-07-30', type: 'ipc', reason: 'Incremento de prima preventivo por tramo de edad', applied: false, campaignId: 'zurich-vida' },
+      { id: 'inc-3', clientName: 'María Gómez', currentPremium: 1800, increasePercent: 11, increaseAmount: 200, date: '2026-08-10', type: 'upgrade', reason: 'Upgrade a Plan Platinum Zurich Vida con ampliación de coberturas', applied: false, campaignId: 'meta-tri' },
+      { id: 'inc-4', clientName: 'Lucía Fernández', currentPremium: 3200, increasePercent: 12.5, increaseAmount: 400, date: '2026-08-25', type: 'upgrade', reason: 'Upgrade a Plan Ahorro Zurich Retiro con aportaciones extraordinarias', applied: false, campaignId: 'salud-pro' },
+      { id: 'inc-5', clientName: 'Carlos A.', currentPremium: 1500, increasePercent: 12.5, increaseAmount: 187.5, date: '2026-07-29', type: 'ipc', reason: 'Ajuste mensual IPC de póliza Salud Pro', applied: false, campaignId: 'salud-pro' },
+      { id: 'inc-6', clientName: 'Julio Martínez', currentPremium: 2200, increasePercent: 15, increaseAmount: 330, date: '2026-08-03', type: 'upgrade', reason: 'Upgrade Plan Seguro Retiro Premium con aportes deducibles', applied: false, campaignId: 'meta-tri' },
+      { id: 'inc-7', clientName: 'Pedro Almodóvar', currentPremium: 4000, increasePercent: 10, increaseAmount: 400, date: '2026-08-14', type: 'ipc', reason: 'Ajuste anual de póliza Zurich Vida', applied: false, campaignId: 'zurich-vida' },
+      { id: 'inc-8', clientName: 'Marta Gómez', currentPremium: 1700, increasePercent: 14.7, increaseAmount: 250, date: '2026-08-18', type: 'upgrade', reason: 'Upgrade Plan Cobertura Integral de Hogar Zurich', applied: false, campaignId: 'bells-auto' },
+      { id: 'inc-9', clientName: 'Tomás Restrepo', currentPremium: 2800, increasePercent: 12.5, increaseAmount: 350, date: '2026-08-28', type: 'upgrade', reason: 'Ampliación de cobertura Seguro de Accidentes Personales', applied: false, campaignId: 'zurich-vida' }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Cargar credenciales mock
+      const storedRole = localStorage.getItem('bells_user_role') || 'Asesor';
+      const storedName = localStorage.getItem('bells_user_name') || 'Carlos';
+
+      document.getElementById('user-display-name').textContent = storedName;
+      document.getElementById('user-display-role').textContent = storedRole === 'Team Leader' ? 'Team Leader / PASS' : 'Asesor Comercial';
+      document.getElementById('user-avatar').textContent = storedName.charAt(0).toUpperCase();
+
+      // Inicializar fechas (Mes actual por defecto)
+      initDateRange();
+
+      // Renderizar todo
+      refreshPlanningData();
+    });
+
+    // Inicializar el Rango de Fechas por Defecto (Mes actual)
+    function initDateRange() {
+      const today = new Date();
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+      activeStartDate = formatLocalDate(firstDay);
+      activeEndDate = formatLocalDate(lastDay);
+
+      document.getElementById('plan-start-date').value = activeStartDate;
+      document.getElementById('plan-end-date').value = activeEndDate;
+      updatePeriodDisplay();
+    }
+
+
+    // Cambiar la vista de la planificación (Semana, Mes, Año, Custom)
+    function changeView(mode) {
+      currentViewMode = mode;
+      
+      const buttons = document.querySelectorAll('.planning-tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      const event = window.event;
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+
+      const today = new Date();
+      const picker = document.getElementById('custom-date-range-picker');
+
+      if (mode === 'semana') {
+        picker.style.display = 'none';
+        
+        // Calcular lunes y domingo de la semana actual
+        const currentDay = today.getDay();
+        const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+        const monday = new Date(today);
+        monday.setDate(today.getDate() + distanceToMonday);
+        
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+
+        activeStartDate = formatLocalDate(monday);
+        activeEndDate = formatLocalDate(sunday);
+        
+      } else if (mode === 'mes') {
+        picker.style.display = 'none';
+        initDateRange();
+        
+      } else if (mode === 'anio') {
+        picker.style.display = 'none';
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        const endOfYear = new Date(today.getFullYear(), 11, 31);
+        
+        activeStartDate = formatLocalDate(startOfYear);
+        activeEndDate = formatLocalDate(endOfYear);
+        
+      } else if (mode === 'custom') {
+        picker.style.display = 'flex';
+        activeStartDate = document.getElementById('plan-start-date').value;
+        activeEndDate = document.getElementById('plan-end-date').value;
+      }
+
+      // Modificar el layout de planning-main según si es semana o no
+      const mainSection = document.querySelector('.planning-main');
+      if (mainSection) {
+        if (mode === 'semana') {
+          mainSection.classList.add('weekly-mode');
+        } else {
+          mainSection.classList.remove('weekly-mode');
+        }
+      }
+
+      updatePeriodDisplay();
+      refreshPlanningData();
+    }
+
+    // Manejar cambios manuales del datepicker custom
+    function handleDateRangeChange() {
+      activeStartDate = document.getElementById('plan-start-date').value;
+      activeEndDate = document.getElementById('plan-end-date').value;
+      updatePeriodDisplay();
+      refreshPlanningData();
+    }
+
+
+    // Refrescar y pintar toda la información de la planificación
+    function refreshPlanningData() {
+
+      // 2. Filtrar los eventos planificados en el rango de fechas
+      const filteredEvents = planEvents.filter(e => {
+        const inDateRange = e.date >= activeStartDate && e.date <= activeEndDate;
+        const matchesCampaign = activeCampaignIdFilter === 'todas' || e.campaignId === activeCampaignIdFilter;
+        return inDateRange && matchesCampaign;
+      });
+
+      // 3. Filtrar los incrementos a clientes programados en el rango
+      const filteredIncrements = clientIncrements.filter(inc => {
+        const inDateRange = inc.date >= activeStartDate && inc.date <= activeEndDate;
+        const matchesCampaign = activeCampaignIdFilter === 'todas' || inc.campaignId === activeCampaignIdFilter;
+        return inDateRange && matchesCampaign;
+      });
+
+      // 6. Renderizar Incrementos de Pólizas
+      renderClientIncrements(filteredIncrements);
+
+      // 7. Renderizar Cronograma Temporal (Semanal o Cronológico)
+      const weeklyContainer = document.getElementById('weekly-calendar-grid');
+      const timelineContainer = document.getElementById('timeline-view-container');
+      const titleEl = document.getElementById('temporal-view-title');
+
+      if (currentViewMode === 'semana') {
+        weeklyContainer.style.display = 'grid';
+        timelineContainer.style.display = 'none';
+        titleEl.innerHTML = `<span>Calendario Semanal</span> <i class="fa-solid fa-calendar-week"></i>`;
+        renderWeeklyCalendar(filteredEvents);
+      } else {
+        weeklyContainer.style.display = 'none';
+        timelineContainer.style.display = 'flex';
+        titleEl.innerHTML = `<span>Cronograma del Período</span> <i class="fa-solid fa-timeline"></i>`;
+        renderTimelineView(filteredEvents);
+      }
+    }
+
+    // Renderizar la grilla semanal
+    function renderWeeklyCalendar(events) {
+      const container = document.getElementById('weekly-calendar-grid');
+      if (!container) return;
+
+      // Obtener el rango de fechas de la semana actual en hora local
+      const startDate = parseLocalDate(activeStartDate);
+      container.innerHTML = '';
+
+      const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(startDate);
+        dayDate.setDate(startDate.getDate() + i);
+
+        const isoString = formatLocalDate(dayDate);
+        const dateDisplay = `${dayDate.getDate()}/${dayDate.getMonth() + 1}`;
+        const dayName = dayNames[i];
+
+        const dayEvents = events.filter(e => e.date === isoString);
+        
+        const isToday = formatLocalDate(new Date()) === isoString;
+        
+        const col = document.createElement('div');
+        col.className = `calendar-day-col ${isToday ? 'today' : ''}`;
+        
+        let eventsHTML = dayEvents.map(e => `
+          <div class="calendar-event-card ${e.type}" onclick="showEventDetails('${e.title.replace(/'/g, "\\'")}', '${e.detail.replace(/'/g, "\\'")}', '${e.time}', '${e.date}', '${e.campaignId}')">
+            <span class="calendar-event-time">${e.time}</span>
+            <span class="fs-11">${e.title}</span>
+          </div>
+        `).join('');
+
+        if (dayEvents.length === 0) {
+          eventsHTML = `<div style="text-align:center; padding: 20px 0; color: var(--text-muted); font-size:10.5px; font-style:italic;">Libre</div>`;
+        }
+
+        col.innerHTML = `
+          <div class="calendar-day-header">
+            <span class="calendar-day-name">${dayName}</span>
+            <span class="calendar-day-date">${dateDisplay}</span>
+          </div>
+          <div class="calendar-events-container">
+            ${eventsHTML}
+          </div>
+        `;
+        container.appendChild(col);
+      }
+    }
+
+    // Renderizar el cronograma lineal/timeline
+    function renderTimelineView(events) {
+      const container = document.getElementById('timeline-view-container');
+      if (!container) return;
+
+      if (events.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px;">
+            <i class="fa-solid fa-calendar-day" style="font-size: 24px; margin-bottom: 8px; display: block; color: var(--text-muted);"></i>
+            No hay eventos programados para este período.
+          </div>
+        `;
+        return;
+      }
+
+      // Ordenar por fecha cronológicamente
+      const sortedEvents = [...events].sort((a, b) => a.date.localeCompare(b.date));
+
+      container.innerHTML = sortedEvents.map(e => {
+        let avatarIcon = 'fa-calendar-day';
+        if (e.type === 'call') avatarIcon = 'fa-phone-flip';
+        else if (e.type === 'meeting') avatarIcon = 'fa-handshake';
+        else if (e.type === 'increase') avatarIcon = 'fa-trend-up';
+
+        const formattedDate = e.date.split('-').reverse().join('/');
+
+        return `
+          <div class="timeline-item" onclick="showEventDetails('${e.title.replace(/'/g, "\\'")}', '${e.detail.replace(/'/g, "\\'")}', '${e.time}', '${e.date}', '${e.campaignId}')">
+            <div class="timeline-avatar ${e.type}">
+              <i class="fa-solid ${avatarIcon}"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <span class="timeline-title">${e.title}</span>
+                <span class="timeline-date">${formattedDate} a las ${e.time} hs</span>
+              </div>
+              <p class="timeline-text">${e.detail}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Renderizar listado de incrementos programados
+    function renderClientIncrements(list) {
+      const container = document.getElementById('increases-list-container');
+      if (!container) return;
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; grid-column: span 2;">
+            <i class="fa-solid fa-check-double" style="font-size: 24px; margin-bottom: 8px; display: block; color: var(--color-green);"></i>
+            No se registran incrementos pendientes en este período.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(inc => {
+        const formattedDate = inc.date.split('-').reverse().join('/');
+        
+        return `
+          <div class="increase-card ${inc.applied ? 'applied' : ''}" id="inc-card-${inc.id}">
+            <div class="increase-header">
+              <div class="increase-client-name">${inc.clientName}</div>
+              <span class="increase-badge ${inc.type}">${inc.type === 'ipc' ? 'Ajuste IPC' : 'Upgrade Plan'}</span>
+            </div>
+            
+            <div class="increase-details">
+              <strong>Prima actual:</strong> $${inc.currentPremium.toLocaleString()} USD/año<br>
+              <strong>Propuesta:</strong> <span style="color: var(--primary); font-weight:700;">+${inc.increasePercent}% (+$${inc.increaseAmount} USD)</span><br>
+              <strong>Concepto:</strong> ${inc.reason}
+              <div class="increase-date-tag">
+                <i class="fa-solid fa-calendar"></i>
+                <span>Programado: ${formattedDate}</span>
+              </div>
+            </div>
+
+            <div class="increase-actions">
+              ${inc.applied 
+                ? `<span class="status-badge" style="background: var(--color-green-bg); color: var(--color-green-text); font-size: 12px; width: 100%; justify-content: center; padding: 6px;"><i class="fa-solid fa-circle-check"></i> Incremento Aplicado</span>`
+                : `
+                  <button class="btn btn-secondary" onclick="postponeIncrement('${inc.id}')" style="flex:1; padding: 6px 10px; font-size:12px;">Posponer</button>
+                  <button class="btn btn-primary" onclick="applyIncrement('${inc.id}')" style="flex:1.5; padding: 6px 10px; font-size:12px;">
+                    <i class="fa-solid fa-check"></i> Aplicar
+                  </button>
+                `
+              }
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Acción de aplicar un incremento de seguro
+    function applyIncrement(id) {
+      const inc = clientIncrements.find(item => item.id === id);
+      if (inc) {
+        inc.applied = true;
+        
+        // Sumar al progreso del vendedor en las campañas personales asociadas
+        const campaigns = getCampaigns();
+        let campUpdated = false;
+        campaigns.forEach(c => {
+          if (c.type === 'personal' && c.id === inc.campaignId) {
+            c.current = Math.min(c.goal, c.current + inc.increaseAmount);
+            campUpdated = true;
+          }
+        });
+
+        if (campUpdated) {
+          localStorage.setItem('bells-campaigns', JSON.stringify(campaigns));
+        }
+
+        // Agregar al historial de actividades de la app
+        const storedName = localStorage.getItem('bells_user_name') || 'Carlos';
+        const formattedDate = new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
+        
+        showNotification('inc-applied', `Incremento para ${inc.clientName} aplicado. Prima aumentada en +$${inc.increaseAmount} USD.`, 'success');
+        
+        // Re-renderizar
+        refreshPlanningData();
+      }
+    }
+
+    // Acción de posponer incremento
+    function postponeIncrement(id) {
+      const inc = clientIncrements.find(item => item.id === id);
+      if (inc) {
+        // Simular posposición a 15 días después en hora local
+        const current = parseLocalDate(inc.date);
+        current.setDate(current.getDate() + 15);
+        inc.date = formatLocalDate(current);
+
+        // Mover también el evento calendar
+        const evt = planEvents.find(e => e.id === parseInt(inc.id.split('-')[1]));
+        if (evt) evt.date = inc.date;
+
+        showNotification('inc-postponed', `Incremento para ${inc.clientName} pospuesto al ${inc.date.split('-').reverse().join('/')}.`, 'info');
+        
+        refreshPlanningData();
+      }
+    }
+
+    // Mostrar detalle del evento en un modal estructurado
+    function showEventDetails(title, detail, time, date, campaignId) {
+      const formattedDate = date.split('-').reverse().join('/');
+      const titleEl = document.getElementById('event-detail-title');
+      const bodyEl = document.getElementById('event-detail-body');
+
+      titleEl.innerHTML = `<i class="fa-solid fa-calendar-check c-primary"></i> <span>Detalle de Actividad</span>`;
+
+      // Buscar nombre de la campaña
+      const campaigns = getCampaigns();
+      const campaign = campaigns.find(c => c.id === campaignId);
+      const campaignName = campaign ? campaign.name : 'Meta General / Corporativo';
+
+      bodyEl.innerHTML = `
+        <div class="mb-16">
+          <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px 0;">${title}</h4>
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+            <i class="fa-regular fa-clock mr-4"></i>${time} hs &nbsp;&bull;&nbsp; <i class="fa-regular fa-calendar mr-4"></i>${formattedDate}
+          </span>
+        </div>
+        <div style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; display: flex; flex-direction: column; gap: 10px; background: var(--bg-muted); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <div><strong>Descripción:</strong><br>${detail}</div>
+          <div style="margin-top: 4px; display: flex; align-items: center; gap: 8px;">
+            <strong>Campaña:</strong>
+            <span style="background: rgba(124, 58, 237, 0.1); color: var(--primary); padding: 2px 8px; border-radius: 12px; font-size: 10.5px; font-weight: 700;">
+              ${campaignName}
+            </span>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('event-details-modal').classList.add('active');
+    }
+
+    function closeEventDetailsModal() {
+      document.getElementById('event-details-modal').classList.remove('active');
+    }
+
+    function closeEventDetailsModalOnBackdrop(e) {
+      if (e.target.id === 'event-details-modal') {
+        closeEventDetailsModal();
+      }
+    }
+
+    // Sincronización manual Zurich
+    function triggerManualSync() {
+      const syncContainer = document.getElementById('sync-container');
+      const text = document.getElementById('sync-time-text');
+      
+      syncContainer.style.background = 'rgba(124, 58, 237, 0.1)';
+      syncContainer.style.color = 'var(--primary)';
+      text.textContent = 'Sincronizando con Zurich...';
+      
+      setTimeout(() => {
+        syncContainer.style.background = 'var(--color-green-bg)';
+        syncContainer.style.color = 'var(--color-green-text)';
+        text.textContent = 'Zurich Sync: OK (1 min)';
+        showNotification('sync-ok', 'Base de datos sincronizada con Zurich', 'success');
+      }, 1500);
+    }
+
+    // Toast de notificaciones minimalistas
+    function showNotification(id, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.id = `toast-${id}`;
+      toast.innerHTML = `
+        <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-info'}"></i>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s reverse forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // --- LOGICA MODAL COMPARTIDA ---
+    
+    function getCampaigns() {
+      const stored = localStorage.getItem('bells-campaigns');
+      if (stored) return JSON.parse(stored);
+      return [];
+    }
+
+    function openCampaignDetailsModal(id) {
+      const campaigns = getCampaigns();
+      const c = campaigns.find(item => item.id === id);
+      if (!c) return;
+
+      const percent = Math.min(100, Math.round((c.current / c.goal) * 100));
+      
+      let dateText = '';
+      let daysBadge = '';
+      if (c.startDate && c.endDate) {
+        const start = new Date(c.startDate);
+        const end = new Date(c.endDate);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        const timeDiff = end.getTime() - today.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        dateText = `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-calendar-days c-primary"></i>
+          <span><strong>Vigencia:</strong> ${start.toLocaleDateString('es-ES', options)} al ${end.toLocaleDateString('es-ES', options)}</span>
+        </div>`;
+        
+        if (daysDiff > 0) {
+          daysBadge = `<span class="status-badge bg-blue radius-pill c-blue fs-11 fw-700 px-8 py-2"><i class="fa-solid fa-clock"></i> Quedan ${daysDiff} días</span>`;
+        } else if (daysDiff === 0) {
+          daysBadge = `<span class="status-badge" style="background: var(--color-yellow-bg); color: var(--color-yellow-text); padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> Finaliza hoy</span>`;
+        } else {
+          daysBadge = `<span class="status-badge" style="background: var(--color-red-bg); color: var(--color-red-text); padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;"><i class="fa-solid fa-circle-xmark"></i> Finalizada</span>`;
+        }
+      } else {
+        dateText = `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-calendar-days c-primary"></i>
+          <span><strong>Vigencia:</strong> Permanente / Sin vencimiento</span>
+        </div>`;
+        daysBadge = `<span class="status-badge bg-blue radius-pill c-blue fs-11 fw-700 px-8 py-2"><i class="fa-solid fa-circle-notch fa-spin"></i> En curso</span>`;
+      }
+
+      let typeBadge = '';
+      if (c.type === 'zurich') {
+        typeBadge = `<span class="status-badge bg-blue radius-pill c-blue fs-11 fw-700 px-8 py-2"><i class="fa-solid fa-shield-halved"></i> Zurich</span>`;
+      } else if (c.type === 'interna') {
+        typeBadge = `<span class="status-badge bg-primary-soft radius-pill c-primary fs-11 fw-700 px-8 py-2"><i class="fa-solid fa-bell"></i> Interna</span>`;
+      } else {
+        typeBadge = `<span class="status-badge" style="background: var(--color-green-bg); color: var(--color-green-text); padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;"><i class="fa-solid fa-user"></i> Incentivo Personal</span>`;
+      }
+
+      const completionBadge = percent >= 100
+        ? `<span class="status-badge" style="background: var(--color-green-bg); color: var(--color-green-text); padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;"><i class="fa-solid fa-trophy"></i> Completada</span>`
+        : daysBadge;
+
+      const isMetaTri = c.id === 'meta-tri';
+      let formattedGoal = '';
+      let formattedCurrent = '';
+      
+      if (isMetaTri) {
+        formattedCurrent = `$${c.current.toLocaleString()}`;
+        formattedGoal = `$${c.goal.toLocaleString()}`;
+      } else {
+        const isMoney = c.goal >= 1000 && c.type !== 'zurich';
+        formattedGoal = isMoney ? `$${c.goal.toLocaleString()}` : `${c.goal} pólizas`;
+        formattedCurrent = isMoney ? `$${c.current.toLocaleString()}` : `${c.current} pólizas`;
+      }
+
+      const participantsHTML = c.participants && c.participants.length > 0
+        ? c.participants.map(p => `
+            <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--bg-muted); border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; color: var(--text-primary);">
+              <div style="width: 18px; height: 18px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700;">${p.charAt(0)}</div>
+              <span>${p}</span>
+            </div>
+          `).join('')
+        : `<span style="font-size: 12.5px; color: var(--text-muted);">Sin participantes asignados</span>`;
+
+      document.getElementById('campaign-details-title').innerHTML = `
+        <i class="fa-solid ${c.rewardIcon || 'fa-gift'} c-primary mr-8"></i>
+        <span>${c.name}</span>
+      `;
+
+      document.getElementById('campaign-details-body').innerHTML = `
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          ${typeBadge}
+          ${completionBadge}
+        </div>
+        
+        <div style="background: var(--bg-muted); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 16px;">
+          <div style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">Incentivo / Premio Oficial</div>
+          <div style="font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid ${c.rewardIcon || 'fa-gift'}" style="color: var(--color-yellow); font-size: 16px;"></i>
+            <span>${c.reward}</span>
+          </div>
+          ${dateText}
+        </div>
+
+        <div class="mb-16">
+          <div style="display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; margin-bottom: 6px;">
+            <span class="c-secondary">Progreso General</span>
+            <span class="c-primary">${percent}% (${formattedCurrent} / ${formattedGoal})</span>
+          </div>
+          <div class="progress-bar-container" style="height: 8px; background: var(--bg-muted); border-radius: var(--radius-pill); overflow: hidden;">
+            <div class="progress-bar ${percent >= 100 ? 'green' : ''}" style="width: ${percent}%; height: 100%;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">Asesores Asignados</div>
+          <div class="d-flex flex-wrap gap-8">
+            ${participantsHTML}
+          </div>
+        </div>
+      `;
+
+      let footerHTML = '';
+      if (c.type === 'personal') {
+        footerHTML = `
+          <button class="btn btn-secondary" onclick="deletePersonalCampaign('${c.id}')" style="background: var(--color-red-bg); color: var(--color-red-text); border-color: rgba(239, 68, 68, 0.15); margin-right: auto; padding: 8px 14px;">
+            <i class="fa-solid fa-trash-can"></i> Eliminar
+          </button>
+          <button class="btn btn-secondary" onclick="closeCampaignDetailsModal()" style="padding: 8px 14px;">Cerrar</button>
+          <button class="btn btn-primary" onclick="incrementCampaignProgress('${c.id}')" style="padding: 8px 14px;">
+            <i class="fa-solid fa-plus"></i> +1 Venta
+          </button>
+        `;
+      } else {
+        footerHTML = `
+          <button class="btn btn-secondary" onclick="closeCampaignDetailsModal()" style="width: 100%; padding: 8px 14px;">Cerrar</button>
+        `;
+      }
+      document.getElementById('campaign-details-footer').innerHTML = footerHTML;
+
+      document.getElementById('campaign-details-modal').classList.add('active');
+    }
+
+    function closeCampaignDetailsModal() {
+      document.getElementById('campaign-details-modal').classList.remove('active');
+    }
+
+    function closeCampaignDetailsModalOnBackdrop(e) {
+      if (e.target.id === 'campaign-details-modal') {
+        closeCampaignDetailsModal();
+      }
+    }
+
+    function incrementCampaignProgress(id) {
+      const campaigns = getCampaigns();
+      const c = campaigns.find(item => item.id === id);
+      if (c) {
+        c.current = Math.min(c.goal, c.current + 1);
+        localStorage.setItem('bells-campaigns', JSON.stringify(campaigns));
+        refreshPlanningData();
+        openCampaignDetailsModal(id);
+        showNotification('campaign-prog', `¡Campaña "${c.name}" actualizada! +1 Venta.`, 'success');
+      }
+    }
+
+    function deletePersonalCampaign(id) {
+      if (confirm('¿Deseas eliminar este incentivo personal?')) {
+        let campaigns = getCampaigns();
+        campaigns = campaigns.filter(c => c.id !== id);
+        localStorage.setItem('bells-campaigns', JSON.stringify(campaigns));
+        refreshPlanningData();
+        closeCampaignDetailsModal();
+        showNotification('campaign-del', 'Incentivo personal eliminado.', 'info');
+      }
+    }
+
+    function openCreateCampaignModal() {
+      const today = new Date();
+      const end = new Date();
+      end.setMonth(today.getMonth() + 1);
+      
+      document.getElementById('new-campaign-start').value = formatLocalDate(today);
+      document.getElementById('new-campaign-end').value = formatLocalDate(end);
+      document.getElementById('new-campaign-name').value = '';
+      document.getElementById('new-campaign-reward').value = '';
+      document.getElementById('new-campaign-goal').value = '10';
+      document.getElementById('new-campaign-type').value = 'personal';
+      handleCampaignTypeChange();
+
+      document.getElementById('create-campaign-modal').classList.add('active');
+    }
+
+    function closeCreateCampaignModal() {
+      document.getElementById('create-campaign-modal').classList.remove('active');
+    }
+
+    function closeCreateCampaignModalOnBackdrop(e) {
+      if (e.target.id === 'create-campaign-modal') {
+        closeCreateCampaignModal();
+      }
+    }
+
+    // --- NUEVAS FUNCIONES DE NAVEGACIÓN DE PERÍODOS Y GESTIÓN DE ACTIVIDADES ---
+
+    // Navegar entre períodos comerciales (Anterior / Siguiente)
+    function navigatePeriod(direction) {
+      const currentStart = parseLocalDate(activeStartDate);
+      
+      if (currentViewMode === 'semana') {
+        currentStart.setDate(currentStart.getDate() + (direction * 7));
+        const sunday = new Date(currentStart);
+        sunday.setDate(currentStart.getDate() + 6);
+        
+        activeStartDate = formatLocalDate(currentStart);
+        activeEndDate = formatLocalDate(sunday);
+        
+      } else if (currentViewMode === 'mes') {
+        currentStart.setMonth(currentStart.getMonth() + direction);
+        const lastDay = new Date(currentStart.getFullYear(), currentStart.getMonth() + 1, 0);
+        
+        activeStartDate = formatLocalDate(currentStart);
+        activeEndDate = formatLocalDate(lastDay);
+        
+      } else if (currentViewMode === 'anio') {
+        currentStart.setFullYear(currentStart.getFullYear() + direction);
+        const endOfYear = new Date(currentStart.getFullYear(), 11, 31);
+        
+        activeStartDate = formatLocalDate(currentStart);
+        activeEndDate = formatLocalDate(endOfYear);
+      }
+      
+      document.getElementById('plan-start-date').value = activeStartDate;
+      document.getElementById('plan-end-date').value = activeEndDate;
+      
+      updatePeriodDisplay();
+      refreshPlanningData();
+    }
+
+    // Actualizar el texto del período actual en la cabecera
+    function updatePeriodDisplay() {
+      const display = document.getElementById('current-period-display');
+      const navContainer = document.getElementById('period-nav-container');
+      if (!display || !navContainer) return;
+      
+      if (currentViewMode === 'custom') {
+        navContainer.style.display = 'none';
+        return;
+      }
+      
+      navContainer.style.display = 'flex';
+      const start = parseLocalDate(activeStartDate);
+      const end = parseLocalDate(activeEndDate);
+      
+      if (currentViewMode === 'semana') {
+        display.textContent = `Sem. ${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
+      } else if (currentViewMode === 'mes') {
+        const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        display.textContent = `${monthNames[start.getMonth()]} ${start.getFullYear()}`;
+      } else if (currentViewMode === 'anio') {
+        display.textContent = `${start.getFullYear()}`;
+      }
+    }
+
+    // Control de Modal de Actividades
+    function openCreateEventModal() {
+      const today = new Date();
+      document.getElementById('new-event-date').value = formatLocalDate(today);
+      document.getElementById('new-event-time').value = '09:00';
+      document.getElementById('new-event-title').value = '';
+      document.getElementById('new-event-detail').value = '';
+      document.getElementById('new-event-type').value = 'call';
+      
+      document.getElementById('create-event-modal').classList.add('active');
+    }
+
+    function closeCreateEventModal() {
+      document.getElementById('create-event-modal').classList.remove('active');
+    }
+
+    function closeCreateEventModalOnBackdrop(e) {
+      if (e.target.id === 'create-event-modal') {
+        closeCreateEventModal();
+      }
+    }
+
+    function saveCreateEvent(e) {
+      e.preventDefault();
+      
+      const type = document.getElementById('new-event-type').value;
+      const title = document.getElementById('new-event-title').value;
+      const detail = document.getElementById('new-event-detail').value;
+      const date = document.getElementById('new-event-date').value;
+      const time = document.getElementById('new-event-time').value;
+      const campaignId = document.getElementById('new-event-campaign').value;
+      
+      const newEvent = {
+        id: planEvents.length + 1,
+        type,
+        title,
+        detail,
+        date,
+        time,
+        campaignId
+      };
+      
+      planEvents.push(newEvent);
+      
+      if (type === 'increase') {
+        const clientName = title.replace(/Aplicar incremento |Aviso Ajuste |Upgrade /i, '');
+        clientIncrements.push({
+          id: `inc-${planEvents.length}`,
+          clientName,
+          currentPremium: 1500,
+          increasePercent: 10,
+          increaseAmount: 150,
+          date,
+          type: 'ipc',
+          reason: detail,
+          applied: false,
+          campaignId
+        });
+      }
+      
+      closeCreateEventModal();
+      refreshPlanningData();
+      showNotification('event-created', `Actividad "${title}" agendada con éxito.`, 'success');
+    }
+
+    function handleCampaignTypeChange() {
+      const type = document.getElementById('new-campaign-type').value;
+      const label = document.getElementById('campaign-reward-label');
+      const title = document.getElementById('create-campaign-modal-title');
+      const input = document.getElementById('new-campaign-reward');
+
+      if (type === 'personal') {
+        label.textContent = 'Premio / Incentivo Auto-promesa';
+        input.placeholder = 'Ej. Cena premium / Bono de comisión';
+        title.textContent = 'Crear Nuevo Incentivo Personal';
+      } else if (type === 'internal') {
+        label.textContent = 'Premio / Incentivo de la Empresa';
+        input.placeholder = 'Ej. Viaje corporativo / Bono especial';
+        title.textContent = 'Crear Nueva Campaña Interna';
+      } else if (type === 'zurich') {
+        label.textContent = 'Incentivo Zurich / Cobertura';
+        input.placeholder = 'Ej. Comisión extra + Sorteo anual';
+        title.textContent = 'Crear Nueva Campaña Zurich';
+      }
+    }
+
+    function submitPersonalCampaign() {
+      const name = document.getElementById('new-campaign-name').value.trim();
+      const reward = document.getElementById('new-campaign-reward').value.trim();
+      const goal = parseInt(document.getElementById('new-campaign-goal').value) || 0;
+      const icon = document.getElementById('new-campaign-icon').value;
+      const start = document.getElementById('new-campaign-start').value;
+      const end = document.getElementById('new-campaign-end').value;
+      const type = document.getElementById('new-campaign-type').value;
+
+      if (!name || !reward || goal <= 0 || !start || !end) {
+        showNotification('camp-err', 'Por favor completa todos los campos correctamente.', 'info');
+        return;
+      }
+
+      const storedName = localStorage.getItem('bells_user_name') || 'Carlos';
+
+      const newCamp = {
+        id: 'camp-' + Date.now(),
+        name: name,
+        reward: reward,
+        type: type,
+        goal: goal,
+        current: 0,
+        startDate: start,
+        endDate: end,
+        rewardIcon: icon,
+        rewardIconName: reward.split(' ')[0],
+        participants: [storedName]
+      };
+
+      const campaigns = getCampaigns();
+      campaigns.push(newCamp);
+      localStorage.setItem('bells-campaigns', JSON.stringify(campaigns));
+      
+      refreshPlanningData();
+      closeCreateCampaignModal();
+      
+      let successMsg = '';
+      if (type === 'personal') {
+        successMsg = `¡Incentivo Personal "${name}" creado con éxito!`;
+      } else if (type === 'internal') {
+        successMsg = `¡Campaña Interna "${name}" creada con éxito!`;
+      } else if (type === 'zurich') {
+        successMsg = `¡Campaña Zurich "${name}" creada con éxito!`;
+      }
+      showNotification('camp-success', successMsg, 'success');
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "../General/login.html";
+    }
+  </script>
+  <!-- Tema compartido (persistencia dark/light) -->
+  <script src="../theme.js"></script>
+  <script>
+    function toggleSidebar(force) {
+      const sidebar = document.getElementById('dashboard-col-left');
+      if (!sidebar) return;
+      if (window.innerWidth <= 768) {
+        const open = typeof force === 'boolean' ? force : !sidebar.classList.contains('mobile-open');
+        sidebar.classList.toggle('mobile-open', open);
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (backdrop) backdrop.classList.toggle('active', open);
+        updateSidebarToggle();
+        return;
+      }
+      const isCollapsed = sidebar.classList.toggle('collapsed');
+      localStorage.setItem('bells-sidebar-collapsed', isCollapsed ? 'true' : 'false');
+      updateSidebarToggle();
+    }
+
+    function updateSidebarToggle() {
+      const btn = document.getElementById('sidebar-toggle');
+      const collapseBtn = document.getElementById('sidebar-collapse-btn');
+      const sidebar = document.getElementById('dashboard-col-left');
+      if (!sidebar) return;
+      const isMobile = window.innerWidth <= 768;
+      if (btn) {
+        const icon = btn.querySelector('i');
+        if (isMobile) {
+          const open = sidebar.classList.contains('mobile-open');
+          icon.className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+          btn.title = open ? 'Cerrar menú' : 'Abrir menú';
+        } else {
+          btn.title = 'Colapsar sidebar';
+        }
+        btn.setAttribute('aria-expanded', (isMobile ? sidebar.classList.contains('mobile-open') : !sidebar.classList.contains('collapsed')) ? 'true' : 'false');
+      }
+      if (collapseBtn) {
+        const collapsed = sidebar.classList.contains('collapsed');
+        collapseBtn.querySelector('i').className = collapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left';
+        collapseBtn.title = collapsed ? 'Expandir sidebar' : 'Colapsar sidebar';
+        collapseBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.getElementById('dashboard-col-left');
+      if (sidebar) {
+        sidebar.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+          const label = item.querySelector('span:last-child');
+          if (label) {
+            const text = label.textContent.trim();
+            item.setAttribute('aria-label', text);
+            item.setAttribute('data-tooltip', text);
+          }
+          if (item.classList.contains('active')) item.setAttribute('aria-current', 'page');
+        });
+        if (localStorage.getItem('bells-sidebar-collapsed') === 'true') {
+          sidebar.classList.add('collapsed');
+        }
+        sidebar.querySelectorAll('.sidebar-nav .nav-item').forEach(a => {
+          a.addEventListener('click', () => {
+            sidebar.classList.remove('collapsed');
+            localStorage.setItem('bells-sidebar-collapsed', 'false');
+            if (window.innerWidth <= 768) toggleSidebar(false);
+            updateSidebarToggle();
+          });
+        });
+      }
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && sidebar && sidebar.classList.contains('mobile-open')) toggleSidebar(false);
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && sidebar) {
+          sidebar.classList.remove('mobile-open');
+          const backdrop = document.getElementById('sidebar-backdrop');
+          if (backdrop) backdrop.classList.remove('active');
+        }
+        updateSidebarToggle();
+      });
+      updateSidebarToggle();
+    });
+  </script>
+</body>
+</html>
