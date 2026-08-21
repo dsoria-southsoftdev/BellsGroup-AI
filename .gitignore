@@ -4,12 +4,16 @@ node_modules/
 
 .opencode/node_modules/
 
-# Tool artifacts
+# Tool & Local artifacts
 .playwright-cli/
 graphify-out/
 scratch/
 Feedbacks/
+feedbacks/
+Feedback/
+feedback/
 Vendedor/Embudo.backup.html
 .jira/
 .env
 .envrc
+jira.md
